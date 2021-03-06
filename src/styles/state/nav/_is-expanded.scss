@@ -1,0 +1,12 @@
+.nav.is-expanded{
+   @media(max-width: 760px){
+      height: 145px;
+   }
+   .nav{
+      &__search{
+         @media(max-width: 760px){
+            opacity: 1;
+         }
+      }
+   }
+}

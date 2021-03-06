@@ -1,0 +1,11 @@
+.menu-item {
+   display: flex;
+   align-items: center;
+   cursor: pointer;
+
+   // .menu-item__txt
+
+   &__txt {
+      flex: 1 0 auto;
+   }
+}

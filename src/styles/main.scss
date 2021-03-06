@@ -1,3 +1,159 @@
-body{
-   background: #000;
+@import 'base/mixins';
+@import 'base/animations';
+
+@import 'modules/nav/nav';
+@import 'modules/hamburger/hamburger';
+
+@import 'modules/side-menu/side-menu';
+@import 'modules/menu-item/menu-item';
+
+@import 'modules/note/note';
+
+@import 'modules/file/file';
+
+@import 'modules/popup/popup';
+
+.black-screen{
+   @include layer;
+   position: fixed;
+   background-color: black;
+   opacity: 0.7;
 }
+
+.relative{
+   width: 100%;
+   height: 100%;
+   position: relative;
+}
+
+.has-side-line{
+   display: flex;
+   align-items: center;
+   p{
+      flex: 0 0 auto;
+   }
+   .has-side-line__line{
+      flex: 1 0;
+      background: #000;
+      height: 1px;
+      margin-top: 5px;
+      margin-left: 15px;
+      margin-right: 10px;
+   }
+}
+
+button{
+   border: none;
+   background: transparent;
+   border: 1px solid black;
+   border-radius: 6px;
+}
+
+.has-title{
+   position: relative;
+
+   &__title{
+      position: absolute;
+      border: 1px solid black;
+      width: 100vw;
+      max-width: 137px;
+      border-radius: 5px;
+      top: 47px;
+      left: -9px;
+      box-shadow: 0 0 5px #0000004a;
+      background: #00000082;
+      color: white;
+      visibility: hidden;
+
+      &::after{
+         content: '';
+         position: absolute;
+         top: -19px;
+         left: 15px;
+         border: 8px solid transparent;
+         border-bottom: 10px solid #00000082;
+      }
+   }
+
+   &:hover{
+      .has-title__title{
+         @media(min-width: 1000px){
+            animation: 0.85s fadeIn;
+            animation-delay: 2.4s;
+            animation-fill-mode: forwards;
+         }
+      }
+   }
+}
+
+.actions{
+   display: flex;
+   flex: 0 0 auto;
+
+   &__action{
+      margin: 0 3px;
+   }
+   &:first-child{margin-left: 0;}
+   &:last-child{margin-right: 0;}
+}
+.action-btn{
+   &:active{
+      box-shadow: 0 0 1pt 1pt #0cc3ec;
+   }
+
+   &_red{
+      @extend .action-btn;
+      &:active{
+         box-shadow: 0 0 1pt 1pt red;
+      }
+   }
+}
+
+.folder-body{
+   display: flex;
+   flex-wrap: wrap;
+   margin: 0 auto;
+
+   .note{
+      margin: 20px;
+   }
+}
+
+.add-btn{
+   @include perfect-center;
+   @include square(55px);
+   background: white;
+   font-size: 30px;
+   border-radius: 100%;
+   box-shadow: 0 2px 5px 1px #8da68d;
+   position: fixed;
+   bottom: 50px;
+   right: 70px;
+   @media(max-width: 1000px){
+      bottom: 6%;
+      right: 8%;
+   }
+   cursor: pointer;
+   transition: 0.2s;
+
+   i{
+      transition: 0.2s;
+      color: #727572;
+   }
+
+   &:hover{
+      background: #564d4d03;
+      color: black;
+   }
+
+   &.active{
+      i{
+         transform: rotate(45deg);
+         color: red;
+      }
+   }
+}
+
+
+@import 'layout/sections';
+

@@ -1,0 +1,25 @@
+.note {
+   text-align: center;
+   max-height: 151px;
+   overflow: hidden;
+
+   // .note__ic
+
+   &__ic {
+      font-size: 50px;
+      width: max-content;
+      color: #005aff;
+   }
+
+   // .note__name
+
+   &__name {
+      font-size: 17px;
+      max-width: 130px;
+   }
+
+   &__ic, &__name{
+      cursor: pointer;
+      margin: 0 auto;
+   }
+}
