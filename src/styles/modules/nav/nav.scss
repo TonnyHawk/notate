@@ -6,6 +6,7 @@
    position: relative;
    transition: height 0.3s;
    overflow: hidden;
+   flex: 0 0 auto;
    @media(max-width: 760px){
       height: 75px;
    }

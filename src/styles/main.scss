@@ -11,12 +11,48 @@
 
 @import 'modules/file/file';
 
+@import 'modules/modal/modal';
 @import 'modules/popup/popup';
+@import 'modules/loader/loader';
+
+#root{
+   display: flex;
+   flex-direction: column;
+   min-height: 100vh;
+}
+
+.folder-body{
+   display: flex;
+   flex-wrap: wrap;
+   flex-direction: column;
+   margin: 0 auto;
+   position: relative;
+   flex: 1 0;
+   width: 100%;
+
+   &__breadcrumbs{
+      display: flex;
+      font-size: 15px;
+      padding: 5px 10px;
+   }
+
+   .note{
+      margin: 20px;
+   }
+
+   &__message{
+      margin: auto auto;
+      p{
+         font-size: 30px;
+      }
+   }
+}
 
 .black-screen{
    @include layer;
    position: fixed;
    background-color: black;
+   display: none;
    opacity: 0.7;
 }
 
@@ -106,16 +142,6 @@ button{
       &:active{
          box-shadow: 0 0 1pt 1pt red;
       }
-   }
-}
-
-.folder-body{
-   display: flex;
-   flex-wrap: wrap;
-   margin: 0 auto;
-
-   .note{
-      margin: 20px;
    }
 }
 

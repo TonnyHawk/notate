@@ -36,6 +36,8 @@ function watcher(){
 
 let develop = parallel(series(css, watcher), startBrowser)
 let build = series(css)
+let wStyles = series(watcher)
 
 exports.default = develop;
 exports.build = build;
+exports.watch = wStyles;

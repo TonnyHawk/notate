@@ -1,13 +1,9 @@
 .popup {
-   position: fixed;
    top: 20%;
    left: calc(50% - 250px);
    width: 500px;
-   border: 1px solid black;
-   box-shadow: 0 0 5px black;
-   border-radius: 5px;
-   background-color: white;
    padding: 20px;
+   display: none;
    @media(max-width: 625px){
       width: 80%;
       left: 10%;
@@ -29,8 +25,10 @@
       position: absolute;
       top: 9px;
       right: 17px;
-      color: red;
       cursor: pointer;
+      &:hover{
+         color: red;
+      }
    }
 
    // .popup__icon
@@ -45,18 +43,35 @@
       }
    }
 
+   // .popup__label
+
+   &__label{
+   }
+
    // .popup__field
 
    &__field {
       flex: 1 1;
       height: 40px;
       font-size: 17px;
-      margin-top: 18px;
       padding-left: 10px;
       border-radius: 5px;
+      margin-top: 5px;
+      width: 100%;
       @media(max-width: 625px){
          flex-basis: 100%;
-         margin-top: -5px;
+      }
+   }
+
+   // .popup__field-message
+
+   &__field-message{
+      color: red;
+      margin-top: 5px;
+      font-size: 13px;
+      display: none;
+      &.is-active{
+         display: block;
       }
    }
 

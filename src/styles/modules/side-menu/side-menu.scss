@@ -1,16 +1,16 @@
 .side-menu {
    position: fixed;
    top: 0;
-   left: 0;
+   left: -100%;
    width: 300px;
    height: 100%;
    background-color: white;
    box-shadow: 0 0 10px black;
+   transition: 0.3s;
    @media(max-width: 400px){
       width: 100%;
       padding-top: 73px;
    }
-   display: none;
 
    // .side-menu__close
 
@@ -30,6 +30,14 @@
          width: 140px;
          right: calc(50% - 70px);
       }
+   }
+
+   // .side-menu__inner
+
+   &__inner{
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 100%;
    }
 
    // .side-menu__title
@@ -73,10 +81,24 @@
    // .side-menu__item
 
    &__item {
-      padding: 15px 25px;
+      // padding: 15px 25px;
       transition: 0.1s;
+      position: relative;
       &:hover{
          background: #25c7221a;
       }
+
+      &.is-active{
+         background: red;
+      }
+
+      .menu-item__txt{
+         padding: 15px 0 15px 25px;
+      }
+      .actions{
+         padding: 15px 25px 15px 0;
+      }
    }
 }
+
+@import '../../state/side-menu/is-open';

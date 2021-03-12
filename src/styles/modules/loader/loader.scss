@@ -1,0 +1,26 @@
+.loader{
+   z-index: 200;
+
+   &__screen{
+      @include layer;
+      z-index: 1;
+      backdrop-filter: blur(2px);
+   }
+
+   &__modal{
+      top: 20%;
+      left: calc(50% - 110px);
+      width: 220px;
+      padding: 20px;
+      text-align: center;
+      @include perfect-center;
+      flex-direction: column;
+      max-height: 266px;
+      z-index: 2;
+   }
+   &__loader{}
+   &__info{
+      font-size: 20px;
+      margin-top: 20px;
+   }
+}
