@@ -158,6 +158,8 @@ class App extends Component {
                      root.setLoading(false)
                   }
                })
+            } else{
+               root.setLoading(false)
             }
             return
          }

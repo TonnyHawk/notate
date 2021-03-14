@@ -39,8 +39,12 @@ class FolderBody extends Component {
       $(this.foldBodyElem.current).on('dblclick', e=>this._openFile(e))
     } else{ // on mobile devices
       let timer;
-      $(this.foldBodyElem.current).on('click', e=>this._openFile(e))
+      $(this.foldBodyElem.current).on('click', e=>{
+        e.preventDefault()
+        this._openFile(e)
+      })
       $(this.foldBodyElem.current).on('touchstart', e=>{
+        e.preventDefault();
         timer = setTimeout(()=>this.props.selectFile(e), 600);
       })
       $(this.foldBodyElem.current).on('touchend ', e=>{
