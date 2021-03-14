@@ -25,33 +25,29 @@ class FolderBody extends Component {
   _openFile = (e)=>{
     let elem = e.target.closest('.note')
     if(elem){ // if we clicked on .note
-      let id = elem.getAttribute('data-id')
+      let id = elem.getAttribute('data-id') 
       this.props.openFile(id)
     }
   }
 
   componentDidMount() {
     // setting events
-    if(!mobileAndTabletCheck()){ // if we are using desctop 
+    if(!mobileAndTabletCheck()){ // for PC
       $(this.foldBodyElem.current).on('click', (e)=>{
         this.props.selectFile(e)
       })
       $(this.foldBodyElem.current).on('dblclick', e=>this._openFile(e))
+
     } else{ // on mobile devices
-      let countDown;
-      $(this.foldBodyElem.current).on('click', (e)=>{this._openFile(e); console.log('clicked');})
-      $(this.foldBodyElem.current).on('touchstart', e=>{
-        e.preventDefault();
-        countDown = setTimeout(()=>this.props.selectFile(e), 600);
-      })
-      $(this.foldBodyElem.current).on('touchend ', e=>{
-        e.preventDefault();
-        clearTimeout(countDown);
-        if(this.props.selectedFile === null){
-          this._openFile(e)
-        }
-      })
+        let hamer = new window.Hammer(this.foldBodyElem.current, {});
+        hamer.on('tap', (e)=>{
+          this._openFile(e);
+        })
+        hamer.on('press', (e)=>{
+          this.props.selectFile(e)
+        })
     }
+
     // END ---
   }
   

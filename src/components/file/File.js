@@ -14,7 +14,6 @@ class File extends Component {
    statusElem = React.createRef();
 
    getSnapshotBeforeUpdate(prevProps){
-      console.log(this.props.status.id);
       if(this.props.status.id !== prevProps.status.id){
          return true
       } else return false
