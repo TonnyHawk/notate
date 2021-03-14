@@ -32,21 +32,11 @@ class FolderBody extends Component {
 
   componentDidMount() {
     // setting events
-    if(!mobileAndTabletCheck()){ // for PC
-      $(this.foldBodyElem.current).on('click', (e)=>{
-        this.props.selectFile(e)
-      })
-      $(this.foldBodyElem.current).on('dblclick', e=>this._openFile(e))
 
-    } else{ // on mobile devices
-        let hamer = new window.Hammer(this.foldBodyElem.current, {});
-        hamer.on('tap', (e)=>{
-          this._openFile(e);
-        })
-        hamer.on('press', (e)=>{
-          this.props.selectFile(e)
-        })
-    }
+    $(this.foldBodyElem.current).on('click', (e)=>{
+      this.props.selectFile(e)
+    })
+    $(this.foldBodyElem.current).on('dblclick', e=>this._openFile(e))
 
     // END ---
   }
