@@ -38,18 +38,18 @@ class FolderBody extends Component {
       })
       $(this.foldBodyElem.current).on('dblclick', e=>this._openFile(e))
     } else{ // on mobile devices
-      let timer;
-      $(this.foldBodyElem.current).on('click', e=>{
-        e.preventDefault()
-        this._openFile(e)
-      })
+      let countDown;
+      $(this.foldBodyElem.current).on('click', (e)=>{this._openFile(e); console.log('clicked');})
       $(this.foldBodyElem.current).on('touchstart', e=>{
         e.preventDefault();
-        timer = setTimeout(()=>this.props.selectFile(e), 600);
+        countDown = setTimeout(()=>this.props.selectFile(e), 600);
       })
       $(this.foldBodyElem.current).on('touchend ', e=>{
         e.preventDefault();
-        clearTimeout(timer);
+        clearTimeout(countDown);
+        if(this.props.selectedFile === null){
+          this._openFile(e)
+        }
       })
     }
     // END ---

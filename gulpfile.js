@@ -7,7 +7,7 @@ let {gulp, src, dest, parallel, series, watch} = require('gulp'),
    cleanCSS = require('gulp-clean-css');
 
 let projFold = './src';
-let distFold = './public'
+let distFold = './public';
 
 function startBrowser(){
    browserSync.init({

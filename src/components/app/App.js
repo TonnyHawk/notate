@@ -42,6 +42,7 @@ class App extends Component {
       files: null,
       folders: [],
       search: '',
+      status: {state: '', message: '', id: 0}
    }
 
    componentDidMount() {
@@ -62,6 +63,10 @@ class App extends Component {
       if(currentFolder === ''){
          this.choseFolder(folders[0].id)
       }
+   }
+
+   setStatus=(stat, txt)=>{
+      this.setState(({status})=>{return {status: {state: stat, message: txt, id: status.id++}}})
    }
 
    callPopup=(funct)=>{
@@ -107,13 +112,14 @@ class App extends Component {
    }
 
    createFile=(name, txt, id=null)=>{
+      let root = this
       function succes(){
          if(id===null){
-            console.log('created a new file');
-         } else console.log('changes saved to file');
+            root.setStatus(true, 'created a new file')
+         } else root.setStatus(true, 'changes saved to file')
       }
-      function failure(err){
-         console.log('can not create file '+err);
+      function failure(){
+         root.setStatus(false, 'can not save the file')
       }
 
       if(id === null){
@@ -299,7 +305,7 @@ class App extends Component {
    }
 
    render() {
-      let {isSideMenuOpen, currentFolder, files, search, currentFile} = this.state
+      let {isSideMenuOpen, currentFolder, files, search, currentFile, status} = this.state
 
       return (
          <>
@@ -337,7 +343,8 @@ class App extends Component {
                   <File 
                      state={this.state.isFileEditorOn}
                      createFile={this.createFile}
-                     currentFile={currentFile}/>
+                     currentFile={currentFile}
+                     status={status}/>
             <div 
                className={`add-btn${this.state.isFileEditorOn ? ' active' : ''}`} 
                onClick={()=>{this.unsetCurrentFile(); this.toggleElement('editor')}}><i class="fas fa-plus"></i>
