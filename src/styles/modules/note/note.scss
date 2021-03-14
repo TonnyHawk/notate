@@ -1,7 +1,12 @@
 .note {
    text-align: center;
    max-height: 151px;
+   height: max-content;
    overflow: hidden;
+   position: relative;
+   padding: 20px;
+   border: 1px solid gainsboro;
+   cursor: pointer;
 
    // .note__ic
 
@@ -16,10 +21,13 @@
    &__name {
       font-size: 17px;
       max-width: 130px;
+      overflow: ellipsis;
+      overflow: hidden;
    }
 
    &__ic, &__name{
-      cursor: pointer;
       margin: 0 auto;
    }
 }
+
+@import '../../state/note/is-active';

@@ -1,0 +1,22 @@
+.folder-body{
+   display: flex;
+   flex-wrap: wrap;
+   flex-direction: column;
+   margin: 0 auto;
+   position: relative;
+   flex: 1 0;
+   width: 100%;
+
+
+
+   .note{
+      margin: 20px 10px;
+   }
+
+   &__message{
+      margin: auto auto;
+      p{
+         font-size: 30px;
+      }
+   }
+}

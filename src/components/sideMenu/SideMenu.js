@@ -3,10 +3,11 @@ import React, { Component } from 'react';
 class SideMenu extends Component {
    render() {
 
+    let {currentFolder, choseFolder, toggleElement, delFolder, folders, callPopup} = this.props;
+
       let additionalClassNames = this.props.isOpen ? ' is-open' : '';
 
 
-      let {currentFolder, choseFolder, toggleElement, delFolder, folders} = this.props;
       let menuItems = folders.map(folder=>{
         let addCl = folder.id === currentFolder.id ? 'is-active' : ''
 
@@ -33,7 +34,7 @@ class SideMenu extends Component {
                <div class="has-side-line__line"></div>
              </div>
              <div class="side-menu__title-actions">
-               <button class="side-menu__action has-title action-btn" onClick={()=>toggleElement('popup')}>
+               <button class="side-menu__action has-title action-btn" onClick={()=>{callPopup('create a folder'); }}>
                  <i class="fas fa-plus"></i>
                  <div class="has-title__title">
                    <p class="has-title__title-txt">add new folder</p>

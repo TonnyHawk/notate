@@ -10,6 +10,7 @@ import Loader from '../loader/Loader'
 import firebase from "firebase/app";
 import "firebase/firestore"
 
+
 const firebaseConfig = {
    apiKey: "AIzaSyAmQehjEsx1sqD0QMqlgRsEHVA1530GiAs",
    authDomain: "notate-1f3b8.firebaseapp.com",
@@ -27,19 +28,20 @@ const firebaseConfig = {
 
 class App extends Component {
 
-   blackScreenElem = null
-   popupElem = null
-
    state = {
       isSideMenuOpen: false,
       isFileEditorOn: false,
       isPopupOpen: false,
+      popup: {isOpen: false, title: '', funct: 'create a folder', data: {}},
       isError: false,
       isLoading: false,
       loadingMessage: 'loading',
       currentFolder: '',
+      currentFile: {name: '', txt: '', folder: '', id: ''},
+      selectedFileId: null,
       files: null,
-      folders: []
+      folders: [],
+      search: '',
    }
 
    componentDidMount() {
@@ -56,25 +58,106 @@ class App extends Component {
    }
 
    componentDidUpdate(){
-      let {currentFolder, folders, files} = this.state
+      let {currentFolder, folders} = this.state
       if(currentFolder === ''){
          this.choseFolder(folders[0].id)
       }
    }
 
+   callPopup=(funct)=>{
+      let popup = {
+         funct, isOpen: true
+      }
+      for(let key in this.state.popup){
+         if(!popup[key]){ // if such element is absent in new popup setting
+            popup[key] = this.state.popup[key] // then we will use the prev value from state
+         }
+      }
+      this.setState({popup})
+   }
+
+   selectFile=(e)=>{
+      let elem = e.target.closest('.note')
+      if(elem !== null){
+         let id = elem.getAttribute('data-id')
+         this.setState({selectedFileId: id})
+      } else{
+         if(this.state.selectedFileId !== null){
+            this.setState({selectedFileId: null})
+         }
+      }
+   }
+
+   unsetCurrentFile=()=>{
+      this.setState({
+         currentFile: {name: '', txt: '', folder: '', id: ''},
+         selectedFileId: null
+      })
+   }
+
+   openFile=(id)=>{
+      console.log('open file');
+      this.setLoading(true, 'opening a file')
+      this.openElement('editor')
+      let index = this.state.files.findIndex(elem=>{
+         return elem.id === id
+      })
+      let currentFile = this.state.files[index]
+      this.setState({currentFile}, ()=>this.setLoading(false))
+   }
+
+   createFile=(name, txt, id=null)=>{
+      function succes(){
+         if(id===null){
+            console.log('created a new file');
+         } else console.log('changes saved to file');
+      }
+      function failure(err){
+         console.log('can not create file '+err);
+      }
+
+      if(id === null){
+         foldRef.doc(this.state.currentFolder.id).collection('files').add({
+            name, txt
+         }).then(succes()).catch(err=>failure(err))
+      } else{
+         foldRef.doc(this.state.currentFolder.id).collection('files').doc(id).set({
+            name, txt
+         }).then(succes()).catch(err=>failure(err))
+      }
+   }
+
+   delFile=()=>{
+      let root = this;
+      let {selectedFileId, currentFolder} = this.state;
+      foldRef.doc(currentFolder.id).collection('files').doc(selectedFileId).delete().then(()=>{
+         root.setState({selectedFileId: null})
+      })
+   }
+
+   renameFile=(name)=>{
+      let {selectedFileId, currentFolder} = this.state;
+      foldRef.doc(currentFolder.id).collection('files').doc(selectedFileId).set({
+         name
+      }).then(()=>{
+         console.log('renamed');
+      })
+   }
+
    getFiles=()=>{
-      console.log('getting files');
       let root = this;
       let {currentFolder} = this.state
-      // if(fileListener !== null){
-      //    fileListener() // unsubscribe from prev snapshots
-      // }
+      if(fileListener !== null){
+         fileListener() // unsubscribe from prev snapshots
+      }
       fileListener = foldRef.doc(currentFolder.id).collection('files').onSnapshot(snap=>{
-         console.log(`name: ${currentFolder.name}, id: ${currentFolder.id}`);
-         if(snap.empty){
-            console.log('snap files is empty');
+         if(snap.empty){ // if there is no files in folder
             if(root.state.files !== null){
-               root.setState({files: null})
+               root.setState({files: null}, ()=>{
+                  if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
+                     root.setLoading(false)
+                  }
+               })
             }
             return
          }
@@ -83,7 +166,13 @@ class App extends Component {
          snap.forEach(doc=>{
             files.push({name: doc.data().name, txt: doc.data().txt, folder: currentFolder.id, id: doc.id})
          })
-         root.setState({files})
+
+
+         root.setState({files}, ()=>{
+            if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
+               root.setLoading(false)
+            }
+         })
       }, error=>{
          console.log('error with getting a files'+error);
       })
@@ -98,11 +187,9 @@ class App extends Component {
             this.createFolder('exapmle folder')
             return
          }
-         console.log('folders snap occured');
          let folders = [];
          snap.forEach(elem=>{
             folders.push({name: elem.data().name, id: elem.id, data: elem.data()})
-            // console.log(elem.collection());
          })
          root.setState({folders})
       }, error=>{
@@ -141,46 +228,29 @@ class App extends Component {
    }
 
 
-   createFile=(name, txt)=>{
-      foldRef.doc(this.state.currentFolder.id).collection('files').add({
-         name, txt
-      }).then(()=>{
-         console.log('succeed');
-      }).catch(err=>{
-         console.log('can not create file '+err);
-      })
-   }
-
-
    choseFolder=(id)=>{
       let {folders} = this.state;
       let index = folders.findIndex(elem=>elem.id === id)
-      this.setState({currentFolder: {name: folders[index].name, id: folders[index].id}})
-      this.getFiles()
+      this.setState({
+         currentFolder: {name: folders[index].name, id: folders[index].id},
+      }, ()=>{
+         this.setLoading(true, 'loading files')
+         this.getFiles()
+         if(this.state.isSideMenuOpen){
+            this.toggleElement('side-menu')
+         }
+      })
    }
 
 
 
    handleError=(message='some error ocured')=>{
-      let root = this;
       this.setState(({isError})=>{return {isError: !isError}})
       console.log(message);
    }
 
-   setLoading=(option, message)=>{
-      if(option){
-         this.setState({isLoading: true, loadingMessage: message})
-      } else{
-         this.setState({isLoading: false, loadingMessage: ''})
-      }
-   }
-
-   toggleClass=(elem, classN)=>{
-      if(elem === 'black-screen'){
-         this.blackScreenElem.current.classList.toggle(classN);
-      } else{
-         elem.current.classList.toggle(classN);
-      }
+   setLoading=(option, message='')=>{
+      this.setState({isLoading: option, loadingMessage: message})
    }
 
    toggleElement=(elem, event=null)=>{
@@ -199,57 +269,81 @@ class App extends Component {
             if(event){
                event.preventDefault()
             }
-            this.setState(({isPopupOpen})=>{
-               return {isPopupOpen: !isPopupOpen}
+            this.setState(({popup})=>{
+               let newPopup = {...popup};
+               newPopup.isOpen = !newPopup.isOpen
+               return {popup: newPopup}
             })
+            break;
+         default: return null;
       }
    }
 
-   // setElem=(elem, option)=>{
-   //    switch(option){
-   //       case 'black-screen':
-   //          this.blackScreenElem = elem
-   //          break;
-   //       case 'popup':
-   //          this.popupElem = elem
-   //          break;
-   //       default: return null
-   //    }
-   //    console.log(elem);
-   // }
+   openElement=(elem)=>{
+      switch(elem){
+         case 'editor':
+            if(!this.state.isFileEditorOn){
+               this.toggleElement('editor')
+            }
+            break;
+         default: return null;
+      }
+   }
+
+   handleInput=(e)=>{
+      let key = e.target.getAttribute('name')
+      let value = e.target.value
+      this.setState({[key]: value})
+   }
 
    render() {
-      let {isSideMenuOpen, currentFolder} = this.state
+      let {isSideMenuOpen, currentFolder, files, search, currentFile} = this.state
 
       return (
          <>
-            <Nav 
-               toggleElement={this.toggleElement}
-               toggleClass={this.toggleClass}
-               blackScreen={this.blackScreenElem}
-            />
-            <FolderBody files={this.state.files} currentFolder={currentFolder}/>
-            <SideMenu 
-               isOpen={isSideMenuOpen}
-               toggleElement={this.toggleElement}
-               createFolder={this.createFolder}
-               folders={this.state.folders}
-               delFolder={this.delFolder}
-               currentFolder={this.state.currentFolder}
-               choseFolder={this.choseFolder}
-               />
+                  <Nav 
+                     toggleElement={this.toggleElement}
+                     doSearch={this.handleInput}
+                     handleInput={this.handleInput}
+                     searchState={search}
+                  />
+                  <FolderBody 
+                     files={files}
+                     search={search}
+                     currentFolder={currentFolder}
+                     openFile={this.openFile}
+                     selectedFile={this.state.selectedFileId}
+                     selectFile={this.selectFile}
+                     delFile={this.delFile}
+                     callPopup={this.callPopup}/>
+                  <SideMenu 
+                     isOpen={isSideMenuOpen}
+                     toggleElement={this.toggleElement}
+                     createFolder={this.createFolder}
+                     folders={this.state.folders}
+                     delFolder={this.delFolder}
+                     currentFolder={this.state.currentFolder}
+                     choseFolder={this.choseFolder}
+                     callPopup={this.callPopup}
+                     />
+                  <PopupWin 
+                     toggleElement={this.toggleElement}
+                     createFolder={this.createFolder}
+                     popup={this.state.popup}
+                     fileData={{id: this.state.selectedFileId, files: this.state.files}}
+                     renameFile={this.renameFile}/>
+                  <File 
+                     state={this.state.isFileEditorOn}
+                     createFile={this.createFile}
+                     currentFile={currentFile}/>
+            <div 
+               className={`add-btn${this.state.isFileEditorOn ? ' active' : ''}`} 
+               onClick={()=>{this.unsetCurrentFile(); this.toggleElement('editor')}}><i class="fas fa-plus"></i>
+               </div>
             <BlackScreen elements={{isSideMenuOpen}}/>
-            <File 
-               state={this.state.isFileEditorOn}
-               createFile={this.createFile}/>
-            <PopupWin 
-               isOn={this.state.isPopupOpen} 
-               toggleElement={this.toggleElement}
-               createFolder={this.createFolder}/>
             <Loader 
                state={this.state.isLoading} 
                message={this.state.loadingMessage}/>
-            <div className={`add-btn${this.state.isFileEditorOn ? ' active' : ''}`} onClick={()=>this.toggleElement('editor')}><i class="fas fa-plus"></i></div>
          </>
       );
    }

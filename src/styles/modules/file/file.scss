@@ -3,10 +3,8 @@
    position: fixed;
    display: flex;
    flex-direction: column;
-   transition: transform 0.8s;
-   transform: rotateZ(90deg);
-   transform-origin: bottom right;
-
+   top: 100vh;
+   transition: top 0.3s;
 
    // .file__header
 

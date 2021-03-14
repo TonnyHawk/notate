@@ -14,38 +14,13 @@
 @import 'modules/modal/modal';
 @import 'modules/popup/popup';
 @import 'modules/loader/loader';
+@import 'modules/folder-body/folder-body';
+
 
 #root{
    display: flex;
    flex-direction: column;
    min-height: 100vh;
-}
-
-.folder-body{
-   display: flex;
-   flex-wrap: wrap;
-   flex-direction: column;
-   margin: 0 auto;
-   position: relative;
-   flex: 1 0;
-   width: 100%;
-
-   &__breadcrumbs{
-      display: flex;
-      font-size: 15px;
-      padding: 5px 10px;
-   }
-
-   .note{
-      margin: 20px;
-   }
-
-   &__message{
-      margin: auto auto;
-      p{
-         font-size: 30px;
-      }
-   }
 }
 
 .black-screen{
@@ -180,6 +155,44 @@ button{
    }
 }
 
+.folder-nav{
+   display: flex;
+   position: relative;
+
+   &__breadcrumbs{
+      font-size: 15px;
+      padding: 5px 10px;
+   }
+
+   &__menu{
+      position: absolute;
+      height: 100%;
+      top: 0;
+      right: 0;
+      display: none;
+
+      &.is-active{
+         display: flex;
+      }
+
+      .menu-item{
+         cursor: pointer;
+         padding: 0 10px;
+         transition: 0.05s;
+         &:hover{
+            background: gainsboro;
+         }
+      }
+   }
+}
+
 
 @import 'layout/sections';
+
+.mob{
+   display: none;
+   @media(max-width: 920px){
+      display: flex;
+   }
+}
 
