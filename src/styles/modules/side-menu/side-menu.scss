@@ -4,7 +4,7 @@
    left: -100%;
    width: 300px;
    height: 100%;
-   background-color: white;
+   background-color: #f1f78b;
    box-shadow: 0 0 10px black;
    transition: 0.3s;
    @media(max-width: 400px){
@@ -85,12 +85,19 @@
       // padding: 15px 25px;
       transition: 0.1s;
       position: relative;
+      width: 80%;
+      margin: 10px auto;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 0 5px black;
       &:hover{
-         background: #25c7221a;
+         background: #7fc8f8;
       }
 
       &.is-active{
-         background: red;
+         background: #7fc8f8;
+         box-shadow: none;
+         border: 1px solid black;
       }
 
       .menu-item__txt{

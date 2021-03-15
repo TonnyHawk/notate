@@ -5,8 +5,9 @@
    padding: 20px;
    display: none;
    @media(max-width: 625px){
-      width: 80%;
-      left: 10%;
+      width: 86%;
+      left: 7%;
+      top: 12%;
    }
 
    // .popup__title
@@ -46,6 +47,9 @@
    // .popup__label
 
    &__label{
+      @media(max-width: 625px){
+         margin: -10px 0 10px;
+      }
    }
 
    // .popup__field
@@ -95,6 +99,7 @@
       padding-right: 11px;
       @media(max-width: 625px){
          padding-right: 0;
+         justify-content: center;
       }
    }
 
@@ -106,6 +111,7 @@
       @media(max-width: 625px){
          margin-right: 0;
          margin-left: 10px;
+         flex: 1;
       }
    }
 }

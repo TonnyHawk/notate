@@ -42,6 +42,7 @@
    &__action {
       @include square(45px);
       font-size: 20px;
+      @include perfect-center;
    }
 
    // .file__body

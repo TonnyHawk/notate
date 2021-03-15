@@ -104,6 +104,7 @@ button{
 
    &__action{
       margin: 0 3px;
+      flex: 0 0 auto;
    }
    &:first-child{margin-left: 0;}
    &:last-child{margin-right: 0;}
@@ -131,6 +132,7 @@ button{
    position: fixed;
    bottom: 50px;
    right: 70px;
+   color: #4488b4;
    @media(max-width: 1000px){
       bottom: 6%;
       right: 8%;
@@ -140,12 +142,9 @@ button{
 
    i{
       transition: 0.2s;
-      color: #727572;
    }
 
    &:hover{
-      background: #564d4d03;
-      color: black;
    }
 
    &.active{
