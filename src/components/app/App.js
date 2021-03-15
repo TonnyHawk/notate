@@ -100,15 +100,19 @@ class App extends Component {
       })
    }
 
-   openFile=(id)=>{
-      console.log('open file');
-      this.setLoading(true, 'opening a file')
-      this.openElement('editor')
+   setCurrentFile=(id)=>{
       let index = this.state.files.findIndex(elem=>{
          return elem.id === id
       })
       let currentFile = this.state.files[index]
       this.setState({currentFile}, ()=>this.setLoading(false))
+   }
+
+   openFile=(id)=>{
+      console.log('open file');
+      this.setLoading(true, 'opening a file')
+      this.openElement('editor')
+      this.setCurrentFile(id)
    }
 
    createFile=(name, txt, id=null)=>{
@@ -125,6 +129,10 @@ class App extends Component {
       if(id === null){
          foldRef.doc(this.state.currentFolder.id).collection('files').add({
             name, txt
+         }).then(file=>{
+
+            root.setCurrentFile(file.id)
+
          }).then(succes()).catch(err=>failure(err))
       } else{
          foldRef.doc(this.state.currentFolder.id).collection('files').doc(id).set({
