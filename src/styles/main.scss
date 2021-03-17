@@ -11,8 +11,6 @@
 
 @import 'modules/file/file';
 
-@import 'modules/modal/modal';
-@import 'modules/popup/popup';
 @import 'modules/loader/loader';
 @import 'modules/folder-body/folder-body';
 
@@ -59,6 +57,7 @@ button{
    background: transparent;
    border: 1px solid black;
    border-radius: 6px;
+   @include perfect-center;
 }
 
 .has-title{
@@ -182,6 +181,20 @@ button{
          &:hover{
             background: gainsboro;
          }
+      }
+   }
+}
+
+.modal{
+   &__icon{
+   font-size: 80px;
+   }
+   &__break-line{
+      @media(min-width: 400px){display: none;}
+   }
+   &__btn{
+      @media(max-width: 400px){
+         flex: 1;
       }
    }
 }

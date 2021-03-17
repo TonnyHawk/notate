@@ -8,6 +8,10 @@
    }
 
    &__modal{
+      position: fixed;
+      border: 1px solid #000000b8;
+      background: white;
+      border-radius: 12px;
       top: 20%;
       left: calc(50% - 110px);
       width: 220px;

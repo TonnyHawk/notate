@@ -8,7 +8,7 @@ class Loader extends Component {
          return (
             <div class="loader">
                <div className='loader__screen'></div>
-               <div class='loader__modal modal'>
+               <div class='loader__modal'>
                   <div class="loader__loader"><div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
                   <p class="loader__info">{message}...</p>
                </div>

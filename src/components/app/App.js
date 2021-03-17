@@ -6,6 +6,7 @@ import BlackScreen from '../blackScreen/BlackScreen'
 import File from '../file/File'
 import PopupWin from '../popupWin/PopupWin'
 import Loader from '../loader/Loader'
+import Popup from '../popupWin/Popup'
 
 import firebase from "firebase/app";
 import "firebase/firestore"
@@ -342,12 +343,17 @@ class App extends Component {
                      choseFolder={this.choseFolder}
                      callPopup={this.callPopup}
                      />
-                  <PopupWin 
+                  {/* <PopupWin 
                      toggleElement={this.toggleElement}
                      createFolder={this.createFolder}
                      popup={this.state.popup}
                      fileData={{id: this.state.selectedFileId, files: this.state.files}}
-                     renameFile={this.renameFile}/>
+                     renameFile={this.renameFile}/> */}
+                  <Popup 
+                     popup={this.state.popup}
+                     toggleElement={this.toggleElement}
+                     renameFile={this.renameFile}
+                     createFolder={this.createFolder}/>
                   <File 
                      state={this.state.isFileEditorOn}
                      createFile={this.createFile}
