@@ -1,12 +1,20 @@
 import React, { Component } from 'react';
+import $ from 'jquery';
 
 class SideMenu extends Component {
+
+  blackScreen = React.createRef();
+
+  componentDidUpdate(prevProps, prevState) {
+    this.props.isOpen ? $(this.blackScreen.current).fadeIn() : $(this.blackScreen.current).fadeOut();
+  }
+  
+
    render() {
 
-    let {currentFolder, choseFolder, toggleElement, delFolder, folders, callPopup} = this.props;
+    let {currentFolder, choseFolder, toggleElement, delFolder, folders, callPopup, isOpen} = this.props;
 
-      let additionalClassNames = this.props.isOpen ? ' is-open' : '';
-
+      let additionalClassNames = isOpen ? ' is-open' : '';
 
       let menuItems = folders.map(folder=>{
         let addCl = folder.id === currentFolder.id ? 'is-active' : ''
@@ -23,6 +31,8 @@ class SideMenu extends Component {
       })
 
       return (
+        <>
+          <div class='black-screen' ref={this.blackScreen} onClick={()=>toggleElement('side-menu')}></div>
          <div class={`side-menu${additionalClassNames}`}>
          <div class="relative">
            <div class="side-menu__close action-btn_red" onClick={()=>toggleElement('side-menu')}><i class="fas fa-times"></i></div>
@@ -46,6 +56,7 @@ class SideMenu extends Component {
           </div>
          </div>
        </div>
+      </>
       );
    }
 }

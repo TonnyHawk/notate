@@ -8,10 +8,6 @@ export default class Popup extends Component {
      name: '',
      editing: false
    }
-
-  //  componentDidMount() {
-  //    this.setState({name: this.props.})
-  //  }
    
 
    static getDerivedStateFromProps(props, state){
@@ -26,6 +22,7 @@ export default class Popup extends Component {
        }
       return state;
      }
+     else return null
    }
 
    handleInput=(e)=>{
@@ -44,6 +41,7 @@ export default class Popup extends Component {
         this.setState({editing: false})
       }
 
+      let {setLoading, renameFolder, renameFile, toggleElement} = this.props
       let info = {};
       switch(popup.funct){
         case 'create a folder':
@@ -63,8 +61,9 @@ export default class Popup extends Component {
             placeHolder: 'File name',
             iconClass: 'far fa-file-alt',
             function: ()=>{
-              this.props.renameFile(this.state.name)
-              this.props.toggleElement('popup')
+              setLoading(true, 'renaming...')
+              renameFile(this.state.name)
+              toggleElement('popup')
             }
           }
           break;
@@ -74,8 +73,10 @@ export default class Popup extends Component {
             placeHolder: 'Folder name',
             iconClass: 'fas fa-folder-open',
             function: ()=>{
-              this.props.renameFolder(this.state.name)
-              this.props.toggleElement('popup')
+              setLoading(true, 'renaming...')
+              renameFolder(this.state.name)
+              toggleElement('popup')
+              toggleElement('side-menu')
             }
           }
           break;

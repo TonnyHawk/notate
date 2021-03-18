@@ -151,21 +151,33 @@ class App extends Component {
    }
 
    renameFile=(name)=>{
+      let root = this;
       let {selectedFileId, currentFolder} = this.state;
       foldRef.doc(currentFolder.id).collection('files').doc(selectedFileId).set({
          name
       }).then(()=>{
          console.log('renamed');
+         root.setLoading(false)
       })
    }
 
    renameFolder=(name)=>{
       let {currentFolder} = this.state;
+      let root = this;
       foldRef.doc(currentFolder.id).set({
          name
       }).then(()=>{
+         foldRef.doc(currentFolder.id).get().then(doc=>{
+            root.setCurrentFolder(doc.data().name, doc.id)
+         })
+      }).then(()=>{
          console.log('renamed');
+         root.setLoading(false)
       })
+   }
+
+   setCurrentFolder=(name, id)=>{
+      this.setState({currentFolder: {name, id}})
    }
 
    getFiles=()=>{
@@ -364,7 +376,8 @@ class App extends Component {
                      renameFile={this.renameFile}
                      renameFolder={this.renameFolder}
                      createFolder={this.createFolder}
-                     fileData={{id: this.state.selectedFileId, files: this.state.files}}/>
+                     fileData={{id: this.state.selectedFileId, files: this.state.files}}
+                     setLoading={this.setLoading}/>
                   <File 
                      state={this.state.isFileEditorOn}
                      createFile={this.createFile}
@@ -374,7 +387,7 @@ class App extends Component {
                className={`add-btn${this.state.isFileEditorOn ? ' active' : ''}`} 
                onClick={()=>{this.unsetCurrentFile(); this.toggleElement('editor')}}><i class="fas fa-plus"></i>
                </div>
-            <BlackScreen elements={{isSideMenuOpen}}/>
+            {/* <BlackScreen elements={{isSideMenuOpen}}/> */}
             <Loader 
                state={this.state.isLoading} 
                message={this.state.loadingMessage}/>

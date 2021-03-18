@@ -4,7 +4,8 @@
    &__screen{
       @include layer;
       z-index: 1;
-      backdrop-filter: blur(2px);
+      opacity: .5;
+      background-color: #000;
    }
 
    &__modal{
