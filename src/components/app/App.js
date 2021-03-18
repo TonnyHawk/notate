@@ -70,9 +70,9 @@ class App extends Component {
       this.setState(({status})=>{return {status: {state: stat, message: txt, id: status.id++}}})
    }
 
-   callPopup=(funct)=>{
+   callPopup=(funct, ...data)=>{
       let popup = {
-         funct, isOpen: true
+         funct, isOpen: true, data
       }
       for(let key in this.state.popup){
          if(!popup[key]){ // if such element is absent in new popup setting
@@ -377,6 +377,7 @@ class App extends Component {
                      renameFolder={this.renameFolder}
                      createFolder={this.createFolder}
                      fileData={{id: this.state.selectedFileId, files: this.state.files}}
+                     folderData={{folders: this.state.folders}}
                      setLoading={this.setLoading}/>
                   <File 
                      state={this.state.isFileEditorOn}

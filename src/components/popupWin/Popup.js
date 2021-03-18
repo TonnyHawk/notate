@@ -6,23 +6,47 @@ export default class Popup extends Component {
 
    state={
      name: '',
-     editing: false
+     editing: false,
+     isOpen: false
    }
    
 
    static getDerivedStateFromProps(props, state){
-    let {id, files} = props.fileData
-     if(files !== null && id !== null){
-       if(!state.editing){
-        let index = props.fileData.files.findIndex(elem=>{
-          return elem.id === id
-        })
-        let name = files[index].name
-        state.name = name
-       }
-      return state;
-     }
-     else return null
+    // let {id, files} = props.fileData
+    //  if(files !== null && id !== null){
+    //    if(!state.editing){
+    //     let index = props.fileData.files.findIndex(elem=>{
+    //       return elem.id === id
+    //     })
+    //     let name = files[index].name
+    //     state.name = name
+    //    }
+    //   return state;
+    //  }
+    //  else return null
+
+    if(props.popup.isOpen !== state.isOpen){
+        if(props.popup.funct === 'rename a file'){
+          let {id, files} = props.fileData
+          let index = props.fileData.files.findIndex(elem=>{
+            return elem.id === id
+          })
+          let name = files[index].name
+          state.name = name
+          state.isOpen = props.popup.isOpen
+        }
+        else if(props.popup.funct === 'rename a folder'){
+          state.name = props.popup.data[0].name
+          state.isOpen = props.popup.isOpen
+        }
+        else if(props.popup.funct === 'create a folder'){
+          state.name = ''
+          state.isOpen = props.popup.isOpen
+        }
+
+    }
+
+    return state
    }
 
    handleInput=(e)=>{
