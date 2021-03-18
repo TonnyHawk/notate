@@ -159,6 +159,15 @@ class App extends Component {
       })
    }
 
+   renameFolder=(name)=>{
+      let {currentFolder} = this.state;
+      foldRef.doc(currentFolder.id).set({
+         name
+      }).then(()=>{
+         console.log('renamed');
+      })
+   }
+
    getFiles=()=>{
       let root = this;
       let {currentFolder} = this.state
@@ -353,7 +362,9 @@ class App extends Component {
                      popup={this.state.popup}
                      toggleElement={this.toggleElement}
                      renameFile={this.renameFile}
-                     createFolder={this.createFolder}/>
+                     renameFolder={this.renameFolder}
+                     createFolder={this.createFolder}
+                     fileData={{id: this.state.selectedFileId, files: this.state.files}}/>
                   <File 
                      state={this.state.isFileEditorOn}
                      createFile={this.createFile}

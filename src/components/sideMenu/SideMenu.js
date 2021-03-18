@@ -15,7 +15,7 @@ class SideMenu extends Component {
           <div className={`side-menu__item menu-item ${addCl}`} key={folder.id}>
             <p class="menu-item__txt" onClick={()=>{choseFolder(folder.id)}}>{folder.name}</p>
             <div class="actions">
-              <button class="actions__action action-btn"><i class="fas fa-pen"></i></button>
+              <button class="actions__action action-btn" onClick={()=>{callPopup('rename a folder'); }}><i class="fas fa-pen"></i></button>
               <button class="actions__action action-btn" onClick={()=>delFolder(folder.id)}><i class="far fa-trash-alt"></i></button>
             </div>
           </div>
