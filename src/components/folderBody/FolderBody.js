@@ -17,6 +17,22 @@ let mobileAndTabletCheck = function() {
   return check;
 };
 
+let elipsize=(str='', length)=>{
+  let newStr = '';
+  if(str.length > length){
+    str = str.split('')
+    for(let i = 0; i < length; i++){
+      newStr += str[i]
+    }
+    newStr += '...'
+  } else{
+    return str
+  }
+
+  return newStr
+}
+
+
 
 class FolderBody extends Component {
 
@@ -57,7 +73,7 @@ class FolderBody extends Component {
               data-id={item.id}
               >
               <div class="note__ic"><i class="fas fa-file-alt"></i></div>
-              <div class="note__name">{item.name}</div>
+              <div class="note__name">{elipsize(item.name, 29)}</div>
             </div>
           </div>
         )

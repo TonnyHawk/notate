@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import Nav from '../nav/Nav';
 import FolderBody from '../folderBody/FolderBody';
 import SideMenu from '../sideMenu/SideMenu';
-import BlackScreen from '../blackScreen/BlackScreen'
 import File from '../file/File'
-import PopupWin from '../popupWin/PopupWin'
 import Loader from '../loader/Loader'
 import Popup from '../popupWin/Popup'
 
 import firebase from "firebase/app";
 import "firebase/firestore"
+
+import '../../styles/main.scss';
 
 
 const firebaseConfig = {
@@ -22,7 +22,11 @@ const firebaseConfig = {
    appId: "1:1026983344770:web:6f2f6e9fddbbb9c56a529b"
  };
 
- firebase.initializeApp(firebaseConfig)
+ if (!firebase.apps.length) {
+   firebase.initializeApp(firebaseConfig)
+}else {
+   firebase.app(); // if already initialized, use that one
+}
  const fs = firebase.firestore()
  const foldRef = fs.collection('folders')
  let fileListener = null;
@@ -364,12 +368,6 @@ class App extends Component {
                      choseFolder={this.choseFolder}
                      callPopup={this.callPopup}
                      />
-                  {/* <PopupWin 
-                     toggleElement={this.toggleElement}
-                     createFolder={this.createFolder}
-                     popup={this.state.popup}
-                     fileData={{id: this.state.selectedFileId, files: this.state.files}}
-                     renameFile={this.renameFile}/> */}
                   <Popup 
                      popup={this.state.popup}
                      toggleElement={this.toggleElement}
@@ -388,7 +386,6 @@ class App extends Component {
                className={`add-btn${this.state.isFileEditorOn ? ' active' : ''}`} 
                onClick={()=>{this.unsetCurrentFile(); this.toggleElement('editor')}}><i class="fas fa-plus"></i>
                </div>
-            {/* <BlackScreen elements={{isSideMenuOpen}}/> */}
             <Loader 
                state={this.state.isLoading} 
                message={this.state.loadingMessage}/>
