@@ -90,7 +90,7 @@ class FolderBody extends Component {
         <>
       <div className="folder-nav container-lg mx-auto">
           <div className='folder-nav__breadcrumbs'>
-            <p>Folder: {currentFolder.name}</p>
+            <p><i class="far fa-folder"></i> {currentFolder.name}</p>
           </div>
           <div className={`folder-nav__menu ${selectedFile !== null ? 'is-active' : ''}`}>
             <div className="menu-item mob" onClick={selectFile}><p>Done</p></div>

@@ -12,11 +12,11 @@ class Nav extends Component {
       return (
       <div className="nav container-lg" ref={this.navBar}>
          <div className="nav__menu-btn" onClick={()=>this.props.toggleElement('side-menu')}>
-           <div className="hamburger hamburger--empatic">
-             <div className="hamburger-box">
-                <div className="hamburger-inner"></div>
-             </div>
-          </div>
+              <div className="hamburger hamburger--empatic">
+                <div className="hamburger-box">
+                   <div className="hamburger-inner"></div>
+                </div>
+                        </div>
          </div>
          <div className="nav__search-btn" onClick={this.toggleNavbar}>
            <i className="fas fa-search"></i>

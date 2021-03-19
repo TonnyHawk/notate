@@ -34,6 +34,9 @@ class File extends Component {
       let title = this.titleElem.current.value
       let txt = this.txtElem.current.value
       let id = this.props.currentFile.id
+      // if(title === '' || title === ' '){
+      //    this.props.setStatus('attention', '')
+      // }
       if(id === ''){
          this.props.createFile(title, txt)
       } else{
@@ -80,7 +83,8 @@ class File extends Component {
                   value={name}
                   onChange={(e)=>this.handleChange(e, 'name')}/>
             <div class="file__actions">
-               <button type='submit' class="file__action action-btn"><i class="far fa-save"></i></button>
+               {/* <button type='submit' class="file__action action-btn"><i class="far fa-save"></i></button> */}
+               <button className='file__action btn btn-primary'><i class="far fa-save"></i></button>
             </div>
             </div>
             <div class="file__body">

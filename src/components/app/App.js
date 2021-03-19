@@ -9,9 +9,6 @@ import Popup from '../popupWin/Popup'
 import firebase from "firebase/app";
 import "firebase/firestore"
 
-import '../../styles/main.scss';
-
-
 const firebaseConfig = {
    apiKey: "AIzaSyAmQehjEsx1sqD0QMqlgRsEHVA1530GiAs",
    authDomain: "notate-1f3b8.firebaseapp.com",
@@ -381,7 +378,8 @@ class App extends Component {
                      state={this.state.isFileEditorOn}
                      createFile={this.createFile}
                      currentFile={currentFile}
-                     status={status}/>
+                     status={status}
+                     setStatus={this.setStatus}/>
             <div 
                className={`add-btn${this.state.isFileEditorOn ? ' active' : ''}`} 
                onClick={()=>{this.unsetCurrentFile(); this.toggleElement('editor')}}><i class="fas fa-plus"></i>

@@ -10,6 +10,7 @@
 @import 'modules/note/note';
 
 @import 'modules/file/file';
+@import 'modules/modal/modal';
 
 @import 'modules/loader/loader';
 @import 'modules/folder-body/folder-body';
@@ -131,22 +132,23 @@ button{
    position: fixed;
    bottom: 50px;
    right: 70px;
-   color: #4488b4;
+   color: #f77f00;
    @media(max-width: 1000px){
       bottom: 6%;
       right: 8%;
    }
    cursor: pointer;
-   transition: 0.2s;
+   transition: 0.3s;
 
    i{
-      transition: 0.2s;
-   }
-
-   &:hover{
+      transition: 0.4s;
    }
 
    &.active{
+      width: 100%;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
       i{
          transform: rotate(45deg);
          color: red;
@@ -181,20 +183,6 @@ button{
          &:hover{
             background: gainsboro;
          }
-      }
-   }
-}
-
-.modal{
-   &__icon{
-   font-size: 80px;
-   }
-   &__break-line{
-      @media(min-width: 400px){display: none;}
-   }
-   &__btn{
-      @media(max-width: 400px){
-         flex: 1;
       }
    }
 }
