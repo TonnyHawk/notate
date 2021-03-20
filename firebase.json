@@ -7,6 +7,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
+    "site": "notate-io",
     "public": "build",
     "ignore": [
       "firebase.json",
@@ -24,3 +25,4 @@
     "template": "remoteconfig.template.json"
   }
 }
+
