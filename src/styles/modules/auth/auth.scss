@@ -1,0 +1,124 @@
+.auth {
+   @include layer;
+   @include perfect-center;
+   z-index: 550;
+   background: gainsboro;
+   perspective: 900px;
+
+   &__link{
+      cursor: pointer;
+      transition: 0.15s;
+      &:hover{
+         color:#0b5ed7;
+      }
+   }
+
+   // .auth__elem
+
+   &__elem {
+      background: white;
+      border-radius: 10px;
+      padding: 20px 13%;
+      @media(max-width: 400px){
+         padding: 20px 10%;
+      }
+      @include square(100%);
+   }
+
+   // .auth__title
+
+   &__title {
+      text-align: center;
+      font-size: 30px;
+      margin-bottom: 23px;
+      font-weight: 500;
+   }
+
+   // .auth__form
+
+   &__form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+   }
+
+   // .auth__input
+
+   &__input {
+      position: relative;
+      padding-top: 27px;
+      margin: 10px 0;
+      width: 100%;
+   }
+
+   // .auth__field
+
+   &__field{
+      width: 100%;
+      font-size: 17px;
+      padding: 8px;
+      border-radius: 5px;
+      &:after{
+         content: 'hello';
+         position: absolute;
+         top: 0;
+         left: 0;
+      }
+   }
+
+   // .auth__field-title
+
+   &__field-title{
+      position: absolute;
+      top: 0;
+      // top: 42px;
+      // left: 10px;
+      font-size: 14px;
+      transition: 0.3s;
+   }
+
+   // .auth__submit
+
+   &__submit {
+   }
+
+   &__submit-line{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 55px;
+      width: 100%;
+   }
+}
+.my-card {
+   position: relative;
+   width: 450px;
+   height: 407px;
+   transform-style: preserve-3d;
+   transition: 0.5s;
+
+   // .card__face
+
+   &__face {
+      position: absolute;
+      backface-visibility: hidden;
+   }
+
+   // .card__face--front
+
+   &__face--front {
+      z-index: 2;
+   }
+
+   // .card__face--back
+
+   &__face--back {
+      transform: rotateY(180deg);
+      z-index: 1;
+   }
+
+   &.do-flip{
+      transform: rotateY(180deg);
+      height: 520px;
+   }
+}

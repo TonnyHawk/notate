@@ -5,6 +5,7 @@ import SideMenu from '../sideMenu/SideMenu';
 import File from '../file/File'
 import Loader from '../loader/Loader'
 import Popup from '../popupWin/Popup'
+import AuthScreen from '../authScreen/AuthScreen'
 
 import firebase from "firebase/app";
 import "firebase/firestore"
@@ -387,6 +388,8 @@ class App extends Component {
             <Loader 
                state={this.state.isLoading} 
                message={this.state.loadingMessage}/>
+
+            <AuthScreen/>
          </>
       );
    }
