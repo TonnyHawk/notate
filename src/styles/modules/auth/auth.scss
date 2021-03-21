@@ -4,6 +4,11 @@
    z-index: 550;
    background: gainsboro;
    perspective: 900px;
+   display: none;
+
+   &.is-active{
+      display: flex;
+   }
 
    &__link{
       cursor: pointer;

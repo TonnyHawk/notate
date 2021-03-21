@@ -6,9 +6,12 @@ import File from '../file/File'
 import Loader from '../loader/Loader'
 import Popup from '../popupWin/Popup'
 import AuthScreen from '../authScreen/AuthScreen'
+import Preloader from '../preloader/Preloader'
 
 import firebase from "firebase/app";
 import "firebase/firestore"
+import "firebase/auth";
+import { Tooltip } from 'reactstrap';
 
 const firebaseConfig = {
    apiKey: "AIzaSyAmQehjEsx1sqD0QMqlgRsEHVA1530GiAs",
@@ -31,7 +34,10 @@ const firebaseConfig = {
 
 class App extends Component {
 
+   _isMounted = false
+
    state = {
+      showPreloader: false,
       isSideMenuOpen: false,
       isFileEditorOn: false,
       isPopupOpen: false,
@@ -45,12 +51,16 @@ class App extends Component {
       files: null,
       folders: [],
       search: '',
-      status: {state: '', message: '', id: 0}
+      status: {state: '', message: '', id: 0},
+      user: null,
    }
 
    componentDidMount() {
+      this._isMounted = true
       if(window.navigator.onLine){
          this.getFolders()
+         this.listenToAuth()
+         this.signIn('anton.veremko@gmail.com', 'antony2509')
       } else{
          this.handleError('no network')
       }
@@ -66,6 +76,73 @@ class App extends Component {
       if(currentFolder === ''){
          this.choseFolder(folders[0].id)
       }
+   }
+
+   setUser=()=>{
+      // if(data.length > 0){
+
+      // }
+      // let user=null
+      // if(name && id){
+      //    user = {
+      //       name, id
+      //    }
+      // }
+      // if(root){
+      //    root.setState({user})
+      // }
+   }
+
+   listenToAuth=()=>{
+      let root = this;
+      firebase.auth().onAuthStateChanged((user)=>{
+         if (user) {
+           // User is signed in.
+           root.setUser(user.email, user.id, root)
+         } else {
+           // No user is signed in.
+           root.setUser(null, null, root)
+         }
+       });
+   }
+
+   registerUser=(email, pass)=>{
+      let root = this;
+      firebase.auth().createUserWithEmailAndPassword(email, pass)
+      .then((userCredential) => {
+        // Signed in 
+        let user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        let errorCode = error.code;
+        let errorMessage = error.message;
+        // ..
+      });
+   }
+
+   signIn=(email, pass)=>{
+      let root = this;
+      firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then((userCredential) => {
+        // Signed in
+        var user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorMessage);
+      });
+   }
+
+   signOut=()=>{
+      firebase.auth().signOut().then(function() {
+         // Sign-out successful.
+         console.log('signed out');
+       }, function(error) {
+         // An error happened.
+       });
    }
 
    setStatus=(stat, txt)=>{
@@ -315,6 +392,11 @@ class App extends Component {
                return {popup: newPopup}
             })
             break;
+         case 'preloader':
+            this.setState(({showPreloader})=>{
+               return {showPreloader: !showPreloader}
+            }, ()=>console.log(this.state.showPreloader))
+            break;
          default: return null;
       }
    }
@@ -337,7 +419,7 @@ class App extends Component {
    }
 
    render() {
-      let {isSideMenuOpen, currentFolder, files, search, currentFile, status} = this.state
+      let {isSideMenuOpen, currentFolder, files, search, currentFile, status , showPreloader, user} = this.state
 
       return (
          <>
@@ -365,6 +447,8 @@ class App extends Component {
                      currentFolder={this.state.currentFolder}
                      choseFolder={this.choseFolder}
                      callPopup={this.callPopup}
+                     user={user}
+                     signOut={this.signOut}
                      />
                   <Popup 
                      popup={this.state.popup}
@@ -389,7 +473,13 @@ class App extends Component {
                state={this.state.isLoading} 
                message={this.state.loadingMessage}/>
 
-            <AuthScreen/>
+            <AuthScreen 
+               toggleElement={this.toggleElement}
+               registerUser={this.registerUser}
+               signIn={this.signIn}
+               user={user}
+               />
+            <Preloader show={showPreloader}/>
          </>
       );
    }

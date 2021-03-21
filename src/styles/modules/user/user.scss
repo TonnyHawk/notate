@@ -1,0 +1,50 @@
+
+.user {
+   background: white;
+   display: flex;
+   height: 83px;
+
+   // .user__aside
+
+   &__aside{
+      @include perfect-center;
+      height: 100%;
+      flex: 0 0 auto;
+   }
+
+   // .user__pict
+
+   &__pict {
+      border-radius: 100%;
+      border: 1px solid black;
+      @include square(65px);
+      margin: 0 10px;
+   }
+
+   // .user__body
+
+   &__body {
+      flex: 1 1;
+      padding: 5px 0 5px 6px;
+   }
+
+   // .user__name
+
+   &__name {
+      font-size: 21px;
+      font-weight: 500;
+      margin-top: 4px;
+   }
+
+   // .user__actions
+
+   &__actions {
+      margin-top: 5px;
+   }
+
+   // .user__action
+
+   &__action {
+      font-size: 10px;
+   }
+}

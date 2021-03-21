@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
-import { Button } from 'reactstrap';
+import Funcs from '../../services/funcs'
+
+let funcs = new Funcs();
 
 class SideMenu extends Component {
 
@@ -13,7 +15,7 @@ class SideMenu extends Component {
 
    render() {
 
-    let {currentFolder, choseFolder, toggleElement, delFolder, folders, callPopup, isOpen} = this.props;
+    let {currentFolder, choseFolder, toggleElement, delFolder, folders, callPopup, isOpen, user} = this.props;
 
       let additionalClassNames = isOpen ? ' is-open' : '';
 
@@ -38,6 +40,23 @@ class SideMenu extends Component {
          <div class="relative">
            <div class="side-menu__close action-btn_red" onClick={()=>toggleElement('side-menu')}><i class="fas fa-times"></i></div>
            <div className='side-menu__inner'>
+
+  <div class="side-menu__user user">
+    <div className="user__aside">
+      <div class="user__pict">
+      
+      </div>
+    </div>
+    <div class="user__body">
+      <p class="user__name">{user ? funcs.elipsize(user.name, 15) : 'not signed id'}</p>
+      <div class="user__actions">
+        <button class="user__action btn btn-danger btn-sm" onClick={this.props.signOut}>Log out</button>
+      </div>
+    </div>
+  </div>
+
+
+
            <div class="side-menu__title">
              <div class="side-menu__title-ic"><i class="fas fa-folder-open"></i></div>
              <div class="has-side-line side-menu__title-txt">

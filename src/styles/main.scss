@@ -1,6 +1,8 @@
 @import 'base/mixins';
 @import 'base/animations';
 
+@import 'modules/preloader/preloader';
+
 @import 'modules/nav/nav';
 @import 'modules/hamburger/hamburger';
 
@@ -188,7 +190,7 @@ button{
    }
 }
 
-
+@import 'modules/user/user';
 @import 'layout/sections';
 
 .mob{
