@@ -29,12 +29,15 @@ const firebaseConfig = {
    firebase.app(); // if already initialized, use that one
 }
  const fs = firebase.firestore()
+ const usersRef = fs.collection('users')
  const foldRef = fs.collection('folders')
  let fileListener = null;
 
 class App extends Component {
 
-   _isMounted = false
+   userListener = null
+   foldersListener = null;
+   _isMounted = false;
 
    state = {
       showPreloader: false,
@@ -56,11 +59,14 @@ class App extends Component {
    }
 
    componentDidMount() {
-      this._isMounted = true
+      this._isMounted = true;
       if(window.navigator.onLine){
-         this.getFolders()
-         this.listenToAuth()
+         // this.listenToAuth()
          this.signIn('anton.veremko@gmail.com', 'antony2509')
+         .then((res)=>{
+            console.log(res);
+            this.getFolders()
+         }).catch(err=>console.log(err))
       } else{
          this.handleError('no network')
       }
@@ -72,36 +78,42 @@ class App extends Component {
    }
 
    componentDidUpdate(){
-      let {currentFolder, folders} = this.state
-      if(currentFolder === ''){
-         this.choseFolder(folders[0].id)
-      }
+      // let {currentFolder, folders} = this.state
+      // if(currentFolder === ''){
+      //    this.choseFolder(folders[0].id)
+      // }
    }
 
-   setUser=()=>{
-      // if(data.length > 0){
+   componentWillUnmount() {
+      this._isMounted = false;
+      this.userListener && this.userListener();
+      this.listenToAuth = undefined;
+   }
+   
 
-      // }
-      // let user=null
-      // if(name && id){
-      //    user = {
-      //       name, id
-      //    }
-      // }
-      // if(root){
-      //    root.setState({user})
-      // }
+   setUser=(...data)=>{
+      let user = {
+         name: data[0],
+         id: data[1]
+      };
+      if(data.length <= 0){
+         user = null
+      }
+      let promise = new Promise((resolve, reject)=>{
+         this.setState({user}, ()=>{resolve(this.state.user)})
+      })
+      return promise
    }
 
    listenToAuth=()=>{
       let root = this;
-      firebase.auth().onAuthStateChanged((user)=>{
+      this.userListener = firebase.auth().onAuthStateChanged((user)=>{
          if (user) {
            // User is signed in.
-           root.setUser(user.email, user.id, root)
+           root.setUser(user.email, user.id)
          } else {
            // No user is signed in.
-           root.setUser(null, null, root)
+           root.setUser()
          }
        });
    }
@@ -123,23 +135,33 @@ class App extends Component {
 
    signIn=(email, pass)=>{
       let root = this;
-      firebase.auth().signInWithEmailAndPassword(email, pass)
-      .then((userCredential) => {
-        // Signed in
-        var user = userCredential.user;
-        // ...
+      let promise =  new Promise((resolve, reject)=>{
+         firebase.auth().signInWithEmailAndPassword(email, pass)
+         .then((userCredential) => {
+           // Signed in
+           var user = userCredential.user;
+           this.setUser(user.email, user.uid).then(res=>{
+              resolve(res)
+            })
+           
+           // ...
+         })
+         .catch((error) => {
+           var errorCode = error.code;
+           var errorMessage = error.message;
+           console.log(errorMessage);
+           reject('can not authorize - '+errorMessage)
+         });
       })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorMessage);
-      });
+      return promise
    }
 
    signOut=()=>{
+      let root = this;
       firebase.auth().signOut().then(function() {
          // Sign-out successful.
          console.log('signed out');
+         root.setUser()
        }, function(error) {
          // An error happened.
        });
@@ -207,7 +229,7 @@ class App extends Component {
       }
 
       if(id === null){
-         foldRef.doc(this.state.currentFolder.id).collection('files').add({
+         usersRef.doc(this.state.user.id).collection('folders').doc(this.state.currentFolder.id).collection('files').add({
             name, txt
          }).then(file=>{
 
@@ -261,11 +283,11 @@ class App extends Component {
 
    getFiles=()=>{
       let root = this;
-      let {currentFolder} = this.state
+      let {currentFolder, user} = this.state
       if(fileListener !== null){
          fileListener() // unsubscribe from prev snapshots
       }
-      fileListener = foldRef.doc(currentFolder.id).collection('files').onSnapshot(snap=>{
+      fileListener = usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').onSnapshot(snap=>{
          if(snap.empty){ // if there is no files in folder
             if(root.state.files !== null){
                root.setState({files: null}, ()=>{
@@ -284,7 +306,7 @@ class App extends Component {
             files.push({name: doc.data().name, txt: doc.data().txt, folder: currentFolder.id, id: doc.id})
          })
 
-
+         console.log(files);
          root.setState({files}, ()=>{
             if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
                root.setLoading(false)
@@ -298,8 +320,8 @@ class App extends Component {
 
    getFolders=()=>{
       let root = this;
-
-      foldRef.onSnapshot(snap => {
+      let {user} = this.state
+      usersRef.doc(user.id).collection('folders').onSnapshot(snap => {
          if(snap.empty){// if collection 'folders' is absent on the firebase
             this.createFolder('exapmle folder')
             return
@@ -317,7 +339,9 @@ class App extends Component {
    createFolder=(name)=>{
       let root = this;
       this.setLoading(true, 'creating a new folder')
-      foldRef.add({
+      let {user} = this.state
+
+      usersRef.doc(user.id).collection('folders').add({
          name: name
       }).then((elem)=>{
 
