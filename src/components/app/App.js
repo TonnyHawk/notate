@@ -65,8 +65,10 @@ class App extends Component {
          this.signIn('anton.veremko@gmail.com', 'antony2509')
          .then((res)=>{
             console.log(res);
-            this.getFolders()
+            this.getFolders().then(()=>this.choseFolder());
          }).catch(err=>console.log(err))
+
+         // this.getFolders().then(()=>this.choseFolder());
       } else{
          this.handleError('no network')
       }
@@ -321,19 +323,24 @@ class App extends Component {
    getFolders=()=>{
       let root = this;
       let {user} = this.state
-      usersRef.doc(user.id).collection('folders').onSnapshot(snap => {
-         if(snap.empty){// if collection 'folders' is absent on the firebase
-            this.createFolder('exapmle folder')
-            return
-         }
-         let folders = [];
-         snap.forEach(elem=>{
-            folders.push({name: elem.data().name, id: elem.id, data: elem.data()})
+      let promise = new Promise((resolve, reject)=>{
+         usersRef.doc(user.id).collection('folders').onSnapshot(snap => {
+            if(snap.empty){// if collection 'folders' is absent on the firebase
+               this.createFolder('exapmle folder')
+               return
+            }
+            let folders = [];
+            snap.forEach(elem=>{
+               folders.push({name: elem.data().name, id: elem.id, data: elem.data()})
+            })
+            root.setState({folders}, ()=>resolve())
+         }, error=>{
+            console.log('error');
+            reject('can not get folders')
          })
-         root.setState({folders})
-      }, error=>{
-         console.log('error');
       })
+
+      return promise
    }
 
    createFolder=(name)=>{
@@ -371,7 +378,10 @@ class App extends Component {
 
    choseFolder=(id)=>{
       let {folders} = this.state;
-      let index = folders.findIndex(elem=>elem.id === id)
+      let index = 0;
+      if(id){
+         index = folders.findIndex(elem=>elem.id === id)
+      }
       this.setState({
          currentFolder: {name: folders[index].name, id: folders[index].id},
       }, ()=>{
