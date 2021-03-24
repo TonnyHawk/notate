@@ -21,6 +21,8 @@
    &__name {
       font-size: 17px;
       max-width: 130px;
+      overflow: hidden;
+      text-overflow: ellipsis;
    }
 
    &__ic, &__name{

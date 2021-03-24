@@ -11,7 +11,6 @@ import Preloader from '../preloader/Preloader'
 import firebase from "firebase/app";
 import "firebase/firestore"
 import "firebase/auth";
-import { Tooltip } from 'reactstrap';
 
 const firebaseConfig = {
    apiKey: "AIzaSyAmQehjEsx1sqD0QMqlgRsEHVA1530GiAs",
@@ -30,7 +29,6 @@ const firebaseConfig = {
 }
  const fs = firebase.firestore()
  const usersRef = fs.collection('users')
- const foldRef = fs.collection('folders')
  let fileListener = null;
 
 class App extends Component {
@@ -40,7 +38,7 @@ class App extends Component {
    _isMounted = false;
 
    state = {
-      showPreloader: false,
+      showPreloader: true,
       isSideMenuOpen: false,
       isFileEditorOn: false,
       isPopupOpen: false,
@@ -62,11 +60,10 @@ class App extends Component {
       this._isMounted = true;
       if(window.navigator.onLine){
          // this.listenToAuth()
-         this.signIn('anton.veremko@gmail.com', 'antony2509')
-         .then((res)=>{
-            console.log(res);
-            this.getFolders().then(()=>this.choseFolder());
-         }).catch(err=>console.log(err))
+         // this.signIn('anton.veremko@gmail.com', 'antony2509')
+         // .then((res)=>{
+         //    this.getFolders().then(()=>this.choseFolder());
+         // }).catch(err=>console.log(err))
 
          // this.getFolders().then(()=>this.choseFolder());
       } else{
@@ -77,13 +74,6 @@ class App extends Component {
    componentDidCatch(error, info) {
       this.handleError()
       console.log("error: "+error);
-   }
-
-   componentDidUpdate(){
-      // let {currentFolder, folders} = this.state
-      // if(currentFolder === ''){
-      //    this.choseFolder(folders[0].id)
-      // }
    }
 
    componentWillUnmount() {
@@ -126,11 +116,13 @@ class App extends Component {
       .then((userCredential) => {
         // Signed in 
         let user = userCredential.user;
+        console.log(userCredential);
         // ...
       })
       .catch((error) => {
         let errorCode = error.code;
         let errorMessage = error.message;
+        console.log(errorMessage);
         // ..
       });
    }
@@ -162,8 +154,8 @@ class App extends Component {
       let root = this;
       firebase.auth().signOut().then(function() {
          // Sign-out successful.
-         console.log('signed out');
          root.setUser()
+         root.toggleElement('side-menu')
        }, function(error) {
          // An error happened.
        });
@@ -213,13 +205,13 @@ class App extends Component {
    }
 
    openFile=(id)=>{
-      console.log('open file');
       this.setLoading(true, 'opening a file')
       this.openElement('editor')
       this.setCurrentFile(id)
    }
 
    createFile=(name, txt, id=null)=>{
+      let {user, currentFolder} = this.state
       let root = this
       function succes(){
          if(id===null){
@@ -231,7 +223,7 @@ class App extends Component {
       }
 
       if(id === null){
-         usersRef.doc(this.state.user.id).collection('folders').doc(this.state.currentFolder.id).collection('files').add({
+         usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').add({
             name, txt
          }).then(file=>{
 
@@ -239,7 +231,7 @@ class App extends Component {
 
          }).then(succes()).catch(err=>failure(err))
       } else{
-         foldRef.doc(this.state.currentFolder.id).collection('files').doc(id).set({
+         usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').doc(id).set({
             name, txt
          }).then(succes()).catch(err=>failure(err))
       }
@@ -247,34 +239,34 @@ class App extends Component {
 
    delFile=()=>{
       let root = this;
-      let {selectedFileId, currentFolder} = this.state;
-      foldRef.doc(currentFolder.id).collection('files').doc(selectedFileId).delete().then(()=>{
+      let {selectedFileId, currentFolder, user} = this.state;
+      usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').doc(selectedFileId).delete().then(()=>{
          root.setState({selectedFileId: null})
       })
    }
 
    renameFile=(name)=>{
       let root = this;
-      let {selectedFileId, currentFolder} = this.state;
-      foldRef.doc(currentFolder.id).collection('files').doc(selectedFileId).set({
+      let {selectedFileId, currentFolder, user} = this.state;
+      usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').doc(selectedFileId).set({
          name
       }).then(()=>{
-         console.log('renamed');
+         console.log('file renamed');
          root.setLoading(false)
       })
    }
 
    renameFolder=(name)=>{
-      let {currentFolder} = this.state;
+      let {currentFolder, user} = this.state;
       let root = this;
-      foldRef.doc(currentFolder.id).set({
+      usersRef.doc(user.id).collection('folders').doc(currentFolder.id).set({
          name
       }).then(()=>{
-         foldRef.doc(currentFolder.id).get().then(doc=>{
+         usersRef.doc(user.id).collection('folders').doc(currentFolder.id).get().then(doc=>{
             root.setCurrentFolder(doc.data().name, doc.id)
          })
       }).then(()=>{
-         console.log('renamed');
+         console.log('folder renamed');
          root.setLoading(false)
       })
    }
@@ -308,7 +300,6 @@ class App extends Component {
             files.push({name: doc.data().name, txt: doc.data().txt, folder: currentFolder.id, id: doc.id})
          })
 
-         console.log(files);
          root.setState({files}, ()=>{
             if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
                root.setLoading(false)
@@ -335,7 +326,6 @@ class App extends Component {
             })
             root.setState({folders}, ()=>resolve())
          }, error=>{
-            console.log('error');
             reject('can not get folders')
          })
       })
@@ -362,13 +352,25 @@ class App extends Component {
 
    delFolder=(id)=>{
       let root = this;
-      let {currentFolder, folders} = this.state
+      let {currentFolder, folders, user} = this.state;
       if(folders.length > 1){// to prevent deleting the last folder
-         foldRef.doc(id).delete().then(()=>{
-            if(currentFolder.id === id){
-               root.setState({currentFolder: ''})
-            }
+
+         usersRef.doc(user.id).collection('folders').get().then(folds=>{
+            folds.forEach(folder=>{
+               if(folder.id === id){
+                  usersRef.doc(user.id).collection('folders').doc(folder.id).collection('files').get().then(files=>{ //deleting all files
+                     files.forEach(file=>{
+                        usersRef.doc(user.id).collection('folders').doc(folder.id).collection('files').doc(file.id).delete().then(()=>{
+                        })
+                     })
+                  }).then(()=>{
+                     usersRef.doc(user.id).collection('folders').doc(folder.id).delete().then(()=>{
+                     })
+                  })
+               }
+            })
          })
+
       } else{
          alert('You can not delete the last folder, at least one should be present')
       }
