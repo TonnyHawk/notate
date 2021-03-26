@@ -5,7 +5,8 @@ class AuthScreen extends Component {
    state = {
       loginMode: true,
       email: '',
-      pass: ''
+      pass: '',
+      waitingForResponce: false
    }
 
    changeMode=()=>{
@@ -18,14 +19,25 @@ class AuthScreen extends Component {
       e.preventDefault();
       let formName = e.target.name
       // this.props.toggleElement('preloader')
+      this.setState({waitingForResponce: true})
       let {email, pass} = this.state;
       let {registerUser, signIn} = this.props
 
       if(formName === 'sign_in'){
-        signIn(email, pass)
+        signIn(email, pass).then(()=>{
+          this.setState({waitingForResponce: false})
+        }).catch((eror)=>{
+          alert(eror)
+          this.setState({waitingForResponce: false})
+        })
       }
       else if(formName === 'sign_up'){
-        registerUser(email, pass)
+        registerUser(email, pass).then(()=>{
+          this.setState({waitingForResponce: false})
+        }).catch((eror)=>{
+          alert(eror)
+          this.setState({waitingForResponce: false})
+        })
       }
    }
 
@@ -55,7 +67,13 @@ class AuthScreen extends Component {
                </div>
                <div className="auth__submit-line">
                   <p className="auth__link" onClick={this.changeMode}>Create an account</p>
-                  <button type='submit' className="btn btn-primary auth__submit">Log in</button>
+                  <button type='submit' className="btn btn-primary auth__submit">
+                    {!this.state.waitingForResponce ? 'Log in' : (
+                      <div class="m-1 spinner-border spinner-border-sm" role="status">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                    )}
+                  </button>
                </div>
 
              </form>
@@ -77,7 +95,13 @@ class AuthScreen extends Component {
                </div>
                <div className="auth__submit-line">
                <p className="auth__link" onClick={this.changeMode}>Already have an account</p>
-                  <button type='submit' className="btn btn-primary auth__submit">Sign in</button>
+               <button type='submit' className="btn btn-primary auth__submit">
+                    {!this.state.waitingForResponce ? 'Log in' : (
+                      <div class="m-1 spinner-border spinner-border-sm" role="status">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                    )}
+                  </button>
                </div>
              </form>
            </div>

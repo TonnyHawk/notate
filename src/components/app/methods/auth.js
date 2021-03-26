@@ -35,19 +35,24 @@ export function listen(){
 
 export function registerUser(email, pass){
    let root = this;
-   this.firebase.auth().createUserWithEmailAndPassword(email, pass)
-   .then((userCredential) => {
-     // Signed in 
-     let user = userCredential.user;
-     console.log(userCredential);
-     // ...
+   let promise = new Promise((res, rej)=>{
+      this.firebase.auth().createUserWithEmailAndPassword(email, pass)
+      .then((userCredential) => {
+        // Signed in 
+        let user = userCredential.user;
+        console.log(userCredential);
+        res()
+        // ...
+      })
+      .catch((error) => {
+        let errorCode = error.code;
+        let errorMessage = error.message;
+        console.log(errorMessage);
+        rej(error)
+        // ..
+      });
    })
-   .catch((error) => {
-     let errorCode = error.code;
-     let errorMessage = error.message;
-     console.log(errorMessage);
-     // ..
-   });
+   return promise
 }
 
 export function signIn(email, pass){
