@@ -58,7 +58,7 @@ class AuthScreen extends Component {
              <p class="auth__title">Sign in</p>
              <form action="" name='sign_in' class="auth__form" onSubmit={this.handleSubmit}>
                <div class="auth__input">
-                 <label className='auth__field-title'>login or email</label>
+                 <label className='auth__field-title'>email</label>
                  <input type="text" className='auth__field' name='email' value={email} onChange={this.handleChange}/>
                </div>
                <div class="auth__input">
@@ -95,8 +95,8 @@ class AuthScreen extends Component {
                </div>
                <div className="auth__submit-line">
                <p className="auth__link" onClick={this.changeMode}>Already have an account</p>
-               <button type='submit' className="btn btn-primary auth__submit">
-                    {!this.state.waitingForResponce ? 'Log in' : (
+               <button type='submit' className="btn btn-success auth__submit">
+                    {!this.state.waitingForResponce ? 'Sign up' : (
                       <div class="m-1 spinner-border spinner-border-sm" role="status">
                         <span class="sr-only">Loading...</span>
                       </div>
