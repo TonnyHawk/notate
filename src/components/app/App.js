@@ -8,6 +8,9 @@ import Popup from '../popupWin/Popup'
 import AuthScreen from '../authScreen/AuthScreen'
 import Preloader from '../preloader/Preloader'
 
+import * as file from './methods/file'
+import * as folder from './methods/folder'
+
 import firebase from "firebase/app";
 import "firebase/firestore"
 import "firebase/auth";
@@ -36,9 +39,17 @@ class App extends Component {
    userListener = null
    foldersListener = null;
    _isMounted = false;
+   constructor(props){
+      super(props)
+
+      this.usersRef = fs.collection('users')
+      this.fileListener = null;
+   }
 
    state = {
-      showPreloader: true,
+      showPreloader: false,
+      preloaderState: 'hidden',
+      documentState: 'ready',
       isSideMenuOpen: false,
       isFileEditorOn: false,
       isPopupOpen: false,
@@ -59,8 +70,8 @@ class App extends Component {
    componentDidMount() {
       this._isMounted = true;
       if(window.navigator.onLine){
-         // this.listenToAuth()
-         // this.signIn('anton.veremko@gmail.com', 'antony2509')
+         this.listenToAuth()
+         this.signIn('anton.veremko@gmail.com', 'antony2509')
          // .then((res)=>{
          //    this.getFolders().then(()=>this.choseFolder());
          // }).catch(err=>console.log(err))
@@ -81,9 +92,19 @@ class App extends Component {
       this.userListener && this.userListener();
       this.listenToAuth = undefined;
    }
+
+   setPreloader=(opt)=>{
+      let promise = new Promise((res, rej)=>{
+         this.setState({showPreloader: opt}, ()=>{
+            res()
+         })
+      })
+      return promise
+   }
    
 
    setUser=(...data)=>{
+      this.setPreloader(true)
       let user = {
          name: data[0],
          id: data[1]
@@ -92,7 +113,10 @@ class App extends Component {
          user = null
       }
       let promise = new Promise((resolve, reject)=>{
-         this.setState({user}, ()=>{resolve(this.state.user)})
+         this.setPreloader(false)
+         this.setState({user}, ()=>{
+            resolve(this.state.user);
+         })
       })
       return promise
    }
@@ -102,7 +126,11 @@ class App extends Component {
       this.userListener = firebase.auth().onAuthStateChanged((user)=>{
          if (user) {
            // User is signed in.
-           root.setUser(user.email, user.id)
+            root.setUser(user.email, user.uid).then(()=>{
+            root.getFolders().then(()=>{
+               this.choseFolder()
+            });
+           })
          } else {
            // No user is signed in.
            root.setUser()
@@ -154,8 +182,8 @@ class App extends Component {
       let root = this;
       firebase.auth().signOut().then(function() {
          // Sign-out successful.
-         root.setUser()
          root.toggleElement('side-menu')
+         // root.toggleElement('preloader')
        }, function(error) {
          // An error happened.
        });
@@ -177,223 +205,37 @@ class App extends Component {
       this.setState({popup})
    }
 
-   selectFile=(e)=>{
-      let elem = e.target.closest('.note')
-      if(elem !== null){
-         let id = elem.getAttribute('data-id')
-         this.setState({selectedFileId: id})
-      } else{
-         if(this.state.selectedFileId !== null){
-            this.setState({selectedFileId: null})
-         }
-      }
-   }
+   // File functions ----------------
 
-   unsetCurrentFile=()=>{
-      this.setState({
-         currentFile: {name: '', txt: '', folder: '', id: ''},
-         selectedFileId: null
-      })
-   }
+   selectFile = file.select.bind(this)
 
-   setCurrentFile=(id)=>{
-      let index = this.state.files.findIndex(elem=>{
-         return elem.id === id
-      })
-      let currentFile = this.state.files[index]
-      this.setState({currentFile}, ()=>this.setLoading(false))
-   }
+   unsetCurrentFile = file.unsetCurrent.bind(this)
 
-   openFile=(id)=>{
-      this.setLoading(true, 'opening a file')
-      this.openElement('editor')
-      this.setCurrentFile(id)
-   }
+   setCurrentFile = file.setCurrent.bind(this)
 
-   createFile=(name, txt, id=null)=>{
-      let {user, currentFolder} = this.state
-      let root = this
-      function succes(){
-         if(id===null){
-            root.setStatus(true, 'created a new file')
-         } else root.setStatus(true, 'changes saved to file')
-      }
-      function failure(){
-         root.setStatus(false, 'can not save the file')
-      }
+   openFile = file.open.bind(this)
 
-      if(id === null){
-         usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').add({
-            name, txt
-         }).then(file=>{
+   createFile = file.create.bind(this)
 
-            root.setCurrentFile(file.id)
+   delFile = file.del.bind(this)
 
-         }).then(succes()).catch(err=>failure(err))
-      } else{
-         usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').doc(id).set({
-            name, txt
-         }).then(succes()).catch(err=>failure(err))
-      }
-   }
+   renameFile = file.rename.bind(this)
 
-   delFile=()=>{
-      let root = this;
-      let {selectedFileId, currentFolder, user} = this.state;
-      usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').doc(selectedFileId).delete().then(()=>{
-         root.setState({selectedFileId: null})
-      })
-   }
+   getFiles = file.getFiles.bind(this)
 
-   renameFile=(name)=>{
-      let root = this;
-      let {selectedFileId, currentFolder, user} = this.state;
-      usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').doc(selectedFileId).set({
-         name
-      }).then(()=>{
-         console.log('file renamed');
-         root.setLoading(false)
-      })
-   }
+   // Folder functions ------------------
 
-   renameFolder=(name)=>{
-      let {currentFolder, user} = this.state;
-      let root = this;
-      usersRef.doc(user.id).collection('folders').doc(currentFolder.id).set({
-         name
-      }).then(()=>{
-         usersRef.doc(user.id).collection('folders').doc(currentFolder.id).get().then(doc=>{
-            root.setCurrentFolder(doc.data().name, doc.id)
-         })
-      }).then(()=>{
-         console.log('folder renamed');
-         root.setLoading(false)
-      })
-   }
+   renameFolder = folder.rename.bind(this)
 
-   setCurrentFolder=(name, id)=>{
-      this.setState({currentFolder: {name, id}})
-   }
+   setCurrentFolder = folder.setCurrent.bind(this)
 
-   getFiles=()=>{
-      let root = this;
-      let {currentFolder, user} = this.state
-      if(fileListener !== null){
-         fileListener() // unsubscribe from prev snapshots
-      }
-      fileListener = usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').onSnapshot(snap=>{
-         if(snap.empty){ // if there is no files in folder
-            if(root.state.files !== null){
-               root.setState({files: null}, ()=>{
-                  if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
-                     root.setLoading(false)
-                  }
-               })
-            } else{
-               root.setLoading(false)
-            }
-            return
-         }
+   getFolders = folder.getFolders.bind(this)
 
-         let files = [];
-         snap.forEach(doc=>{
-            files.push({name: doc.data().name, txt: doc.data().txt, folder: currentFolder.id, id: doc.id})
-         })
+   createFolder = folder.create.bind(this)
 
-         root.setState({files}, ()=>{
-            if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
-               root.setLoading(false)
-            }
-         })
-      }, error=>{
-         console.log('error with getting a files'+error);
-      })
-   }
-   
+   delFolder = folder.del.bind(this)
 
-   getFolders=()=>{
-      let root = this;
-      let {user} = this.state
-      let promise = new Promise((resolve, reject)=>{
-         usersRef.doc(user.id).collection('folders').onSnapshot(snap => {
-            if(snap.empty){// if collection 'folders' is absent on the firebase
-               this.createFolder('exapmle folder')
-               return
-            }
-            let folders = [];
-            snap.forEach(elem=>{
-               folders.push({name: elem.data().name, id: elem.id, data: elem.data()})
-            })
-            root.setState({folders}, ()=>resolve())
-         }, error=>{
-            reject('can not get folders')
-         })
-      })
-
-      return promise
-   }
-
-   createFolder=(name)=>{
-      let root = this;
-      this.setLoading(true, 'creating a new folder')
-      let {user} = this.state
-
-      usersRef.doc(user.id).collection('folders').add({
-         name: name
-      }).then((elem)=>{
-
-         elem.get().then(doc=>{
-            root.choseFolder(doc.id) // created folder is now Current
-            root.setLoading(false)
-         })
-
-      }).catch((er)=>{console.log('error with creating a folder '+er)})
-   }
-
-   delFolder=(id)=>{
-      let root = this;
-      let {currentFolder, folders, user} = this.state;
-      if(folders.length > 1){// to prevent deleting the last folder
-
-         usersRef.doc(user.id).collection('folders').get().then(folds=>{
-            folds.forEach(folder=>{
-               if(folder.id === id){
-                  usersRef.doc(user.id).collection('folders').doc(folder.id).collection('files').get().then(files=>{ //deleting all files
-                     files.forEach(file=>{
-                        usersRef.doc(user.id).collection('folders').doc(folder.id).collection('files').doc(file.id).delete().then(()=>{
-                        })
-                     })
-                  }).then(()=>{
-                     usersRef.doc(user.id).collection('folders').doc(folder.id).delete().then(()=>{
-                     })
-                  })
-               }
-            })
-         })
-
-      } else{
-         alert('You can not delete the last folder, at least one should be present')
-      }
-
-   }
-
-
-   choseFolder=(id)=>{
-      let {folders} = this.state;
-      let index = 0;
-      if(id){
-         index = folders.findIndex(elem=>elem.id === id)
-      }
-      this.setState({
-         currentFolder: {name: folders[index].name, id: folders[index].id},
-      }, ()=>{
-         this.setLoading(true, 'loading files')
-         this.getFiles()
-         if(this.state.isSideMenuOpen){
-            this.toggleElement('side-menu')
-         }
-      })
-   }
+   choseFolder = folder.chose.bind(this)
 
 
 
@@ -431,7 +273,7 @@ class App extends Component {
          case 'preloader':
             this.setState(({showPreloader})=>{
                return {showPreloader: !showPreloader}
-            }, ()=>console.log(this.state.showPreloader))
+            }, ()=>console.log("preloader: "+this.state.showPreloader))
             break;
          default: return null;
       }
@@ -455,7 +297,9 @@ class App extends Component {
    }
 
    render() {
-      let {isSideMenuOpen, currentFolder, files, search, currentFile, status , showPreloader, user} = this.state
+      let {isSideMenuOpen, currentFolder, files, 
+            search, currentFile, status , showPreloader, user, 
+            preloaderState, documentState} = this.state
 
       return (
          <>
@@ -515,7 +359,12 @@ class App extends Component {
                signIn={this.signIn}
                user={user}
                />
-            <Preloader show={showPreloader}/>
+            {/* <Preloader 
+               show={showPreloader}
+               toggleElement={this.toggleElement}
+               preloaderState={preloaderState}
+               documentState={documentState}
+               /> */}
          </>
       );
    }
