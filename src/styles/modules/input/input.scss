@@ -1,0 +1,22 @@
+.input{
+   position: relative;
+
+   &__field{
+      z-index: 2;
+      background: white;
+      position: relative;
+   }
+
+   &__error{
+      position: absolute;
+      bottom: 0;
+      font-size: 12px;
+      color: red;
+      transition: 0.3s;
+      z-index: 1;
+
+      &.is-active{
+         bottom: -20px;
+      }
+   }
+}

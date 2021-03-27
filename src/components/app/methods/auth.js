@@ -48,7 +48,7 @@ export function registerUser(email, pass){
         let errorCode = error.code;
         let errorMessage = error.message;
         console.log(errorMessage);
-        rej(error)
+        rej(errorMessage)
         // ..
       });
    })

@@ -27,7 +27,10 @@
       @media(max-width: 400px){
          padding: 20px 10%;
       }
-      @include square(100%);
+      // @include square(100%);
+      width: 100%;
+      border: 1px solid black;
+      padding-bottom: 51px;
    }
 
    // .auth__title
@@ -94,11 +97,24 @@
       margin-top: 55px;
       width: 100%;
    }
+
+   &__error{
+      width: 100%;
+      padding: 10px 15px;
+      margin-top: 20px;
+      display: none;
+      color: #ffd5d5;
+
+      &.is-visible{
+         display: block;
+      }
+   }
 }
 .my-card {
    position: relative;
-   width: 450px;
-   height: 407px;
+   width: 452px;
+   // height: 407px;
+   height: max-content;
    transform-style: preserve-3d;
    transition: 0.5s;
 
@@ -107,6 +123,7 @@
    &__face {
       position: absolute;
       backface-visibility: hidden;
+      margin-top: -50%;
    }
 
    // .card__face--front
@@ -124,6 +141,6 @@
 
    &.do-flip{
       transform: rotateY(180deg);
-      height: 520px;
+      // height: 520px;
    }
 }
