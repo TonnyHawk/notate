@@ -49,8 +49,8 @@ class App extends Component {
 
    state = {
       showPreloader: false,
-      preloaderState: 'hidden',
-      documentState: 'ready',
+      preloaderState: null,
+      documentReadyState: false,
       isSideMenuOpen: false,
       isFileEditorOn: false,
       isPopupOpen: false,
@@ -66,13 +66,14 @@ class App extends Component {
       search: '',
       status: {state: '', message: '', id: 0},
       user: null,
+      isNewlyCreated: true
    }
 
    componentDidMount() {
       this._isMounted = true;
       if(window.navigator.onLine){
          this.listenToAuth()
-         this.signIn('anton.veremko@gmail.com', 'antony2509')
+         // this.signIn('anton.veremko@gmail.com', 'antony2509')
          // .then((res)=>{
          //    this.getFolders().then(()=>this.choseFolder());
          // }).catch(err=>console.log(err))
@@ -94,13 +95,8 @@ class App extends Component {
       this.listenToAuth = undefined;
    }
 
-   setPreloader=(opt)=>{
-      let promise = new Promise((res, rej)=>{
-         this.setState({showPreloader: opt}, ()=>{
-            res()
-         })
-      })
-      return promise
+   setDocumentState=(param)=>{
+      this.setState({documentReadyState: param})
    }
    
 
@@ -195,11 +191,6 @@ class App extends Component {
                return {popup: newPopup}
             })
             break;
-         case 'preloader':
-            this.setState(({showPreloader})=>{
-               return {showPreloader: !showPreloader}
-            }, ()=>console.log("preloader: "+this.state.showPreloader))
-            break;
          default: return null;
       }
    }
@@ -215,6 +206,32 @@ class App extends Component {
       }
    }
 
+   openPreloader=()=>{
+      return new Promise((res, rej)=>{
+         this.setState({showPreloader: true}, ()=>{
+            let timer = setInterval(()=>{
+               // console.log('listen to preloader ready state');
+               if(this.state.preloaderState === 'opened'){
+                  clearInterval(timer)
+                  res()
+               }
+            }, 500)
+         })
+      })
+   }
+
+   setPreloaderShowState=(prop)=>{
+      this.setState({showPreloader: prop})
+   }
+
+   setPreloaderState=(prop)=>{
+      this.setState({preloaderState: prop})
+   }
+
+   setDocumentReadyState=(prop)=>{
+      this.setState({documentReadyState: prop})
+   }
+
    handleInput=(e)=>{
       let key = e.target.getAttribute('name')
       let value = e.target.value
@@ -224,7 +241,7 @@ class App extends Component {
    render() {
       let {isSideMenuOpen, currentFolder, files, 
             search, currentFile, status , showPreloader, user, 
-            preloaderState, documentState} = this.state
+            preloaderState, documentReadyState} = this.state
 
       return (
          <>
@@ -278,18 +295,19 @@ class App extends Component {
                state={this.state.isLoading} 
                message={this.state.loadingMessage}/>
 
-            {/* <AuthScreen 
+            <AuthScreen 
                toggleElement={this.toggleElement}
                registerUser={this.registerUser}
                signIn={this.signIn}
                user={user}
-               /> */}
-            {/* <Preloader 
+               />
+            <Preloader 
                show={showPreloader}
-               toggleElement={this.toggleElement}
-               preloaderState={preloaderState}
-               documentState={documentState}
-               /> */}
+               documentReadyState={documentReadyState}
+               setPreloaderState={this.setPreloaderState}
+               setDocumentState={this.setDocumentReadyState}
+               setPreloaderShowState={this.setPreloaderShowState}
+               />
          </>
       );
    }

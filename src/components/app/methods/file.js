@@ -83,31 +83,39 @@ export function getFiles(){
    if(this.fileListener !== null){
       this.fileListener() // unsubscribe from prev snapshots
    }
-   this.fileListener = this.usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').onSnapshot(snap=>{
-      if(snap.empty){ // if there is no files in folder
-         if(root.state.files !== null){
-            root.setState({files: null}, ()=>{
-               if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
-                  root.setLoading(false)
-               }
-            })
-         } else{
-            root.setLoading(false)
-         }
-         return
-      }
 
-      let files = [];
-      snap.forEach(doc=>{
-         files.push({name: doc.data().name, txt: doc.data().txt, folder: currentFolder.id, id: doc.id})
-      })
-
-      root.setState({files}, ()=>{
-         if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
-            root.setLoading(false)
+   let promise = new Promise((res, rej)=>{
+      this.fileListener = this.usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').onSnapshot(snap=>{
+         if(snap.empty){ // if there is no files in folder
+            if(root.state.files !== null){
+               root.setState({files: null}, ()=>{
+                  if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
+                     root.setLoading(false)
+                     res()
+                  }
+               })
+            } else{
+               root.setLoading(false)
+               res()
+            }
+            return promise
          }
+   
+         let files = [];
+         snap.forEach(doc=>{
+            files.push({name: doc.data().name, txt: doc.data().txt, folder: currentFolder.id, id: doc.id})
+         })
+   
+         root.setState({files}, ()=>{
+            if(root.state.isLoading === true && root.state.loadingMessage === 'loading files'){
+               root.setLoading(false)
+               res()
+            }
+         })
+      }, error=>{
+         console.log('error with getting a files'+error);
+         rej(error)
       })
-   }, error=>{
-      console.log('error with getting a files'+error);
    })
+   return promise
 }

@@ -1,5 +1,4 @@
 export function setUser(...data){
-   this.setPreloader(true)
    let user = {
       name: data[0],
       id: data[1]
@@ -8,7 +7,6 @@ export function setUser(...data){
       user = null
    }
    let promise = new Promise((resolve, reject)=>{
-      this.setPreloader(false)
       this.setState({user}, ()=>{
          resolve(this.state.user);
       })
@@ -21,34 +19,47 @@ export function listen(){
    this.userListener = this.firebase.auth().onAuthStateChanged((user)=>{
       if (user) {
         // User is signed in.
+      //   console.log(`SIGNED IN ${user} ${user.email} ${user.uid}`);
+      this.openPreloader().then(()=>{
+         // console.log('preloader is opened');
          root.setUser(user.email, user.uid).then(()=>{
-         root.getFolders().then(()=>{
-            this.choseFolder()
-         });
-        })
+            // console.log('setted user');
+            root.getFolders().then((message)=>{
+               // console.log(message);
+               this.choseFolder().then(()=>{
+                  // console.log('chosed folder');
+                  // console.log('document is ready');
+                  this.setDocumentReadyState(true)
+               }).catch(er=>console.log(`can not chose a folder ${er}`))
+            }).catch(er=>console.log(er));
+         })
+      }).catch(()=>alert('preloader error'))
       } else {
         // No user is signed in.
-        root.setUser()
+        if(!this.state.isNewlyCreated){ // user was never been authorized
+         this.openPreloader().then(()=>{
+            root.setUser().then(()=>{
+               // console.log('document is ready');
+               this.setDocumentReadyState(true)
+            })
+           })
+         }else{
+            this.setState({isNewlyCreated: false})
+         }
       }
     });
 }
 
 export function registerUser(email, pass){
-   let root = this;
    let promise = new Promise((res, rej)=>{
       this.firebase.auth().createUserWithEmailAndPassword(email, pass)
       .then((userCredential) => {
         // Signed in 
-        let user = userCredential.user;
-        console.log(userCredential);
         res()
         // ...
       })
       .catch((error) => {
-        let errorCode = error.code;
-        let errorMessage = error.message;
-        console.log(errorMessage);
-        rej(errorMessage)
+        rej(error.message)
         // ..
       });
    })
@@ -56,23 +67,17 @@ export function registerUser(email, pass){
 }
 
 export function signIn(email, pass){
-   let root = this;
    let promise =  new Promise((resolve, reject)=>{
       this.firebase.auth().signInWithEmailAndPassword(email, pass)
       .then((userCredential) => {
         // Signed in
-        var user = userCredential.user;
-        this.setUser(user.email, user.uid).then(res=>{
-           resolve(res)
-         })
+
+      resolve()
         
         // ...
       })
       .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorMessage);
-        reject('can not authorize - '+errorMessage)
+        reject('can not authorize - '+error.message)
       });
    })
    return promise
@@ -83,7 +88,6 @@ export function signOut(){
    this.firebase.auth().signOut().then(function() {
       // Sign-out successful.
       root.toggleElement('side-menu')
-      // root.toggleElement('preloader')
     }, function(error) {
       // An error happened.
     });

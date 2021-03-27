@@ -12,6 +12,16 @@ class AuthScreen extends Component {
       error: {state: false, txt: ''}
    }
 
+   clearFields=()=>{
+     this.setState({
+      loginMode: true,
+      email: '',
+      pass: '',
+      waitingForResponce: false,
+      error: {state: false, txt: ''}
+    })
+   }
+
    changeMode=()=>{
       this.setState(({loginMode})=>{
         this.setError()
@@ -33,7 +43,6 @@ class AuthScreen extends Component {
    handleSubmit=(e)=>{
       e.preventDefault();
       let formName = e.target.name
-      // this.props.toggleElement('preloader')
 
       let fields = e.target.querySelectorAll('.input__field')
 
@@ -54,14 +63,14 @@ class AuthScreen extends Component {
   
         if(formName === 'sign_in'){
           signIn(email, pass).then(()=>{
-            this.setState({waitingForResponce: false})
+            this.clearFields()
           }).catch((error)=>{
             this.setState({waitingForResponce: false, error: {state: true, txt: error}})
           })
         }
         else if(formName === 'sign_up'){
           registerUser(email, pass).then(()=>{
-            this.setState({waitingForResponce: false})
+            this.clearFields()
           }).catch((error)=>{
             this.setState({waitingForResponce: false, error: {state: true, txt: error}})
           })

@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 
 class Preloader extends PureComponent {
 
@@ -8,7 +8,7 @@ class Preloader extends PureComponent {
           targets: '.preloader',
           top: 0,
           easing: "easeOutExpo",
-          duration: 1300,
+          duration: 1500,
         })
         .add({
           targets: '.ml11 .line',
@@ -36,6 +36,7 @@ class Preloader extends PureComponent {
           opacity: 0,
           easing: "easeOutExpo",
           duration: 700,
+          complete: ()=>this.props.setPreloaderState('opened')
         })
    }
 
@@ -46,17 +47,26 @@ class Preloader extends PureComponent {
       top: '100vh',
       easing: "easeOutExpo",
       duration: 1300,
-      // delay: 700,
+      delay: 400,
+      complete: ()=>{
+        this.props.setDocumentState(false)
+        this.props.setPreloaderState('closed')
+        this.props.setPreloaderShowState(false)
+      }
     })
    }
 
-
-   componentDidUpdate() {
-
+   componentDidUpdate(prevProps, prevState) {
+     if(this.props.show !== prevProps.show && this.props.show){
+       this.showUp()
+     }
+     if(this.props.documentReadyState){
+        this.hideAway()
+     }
    }
+  
    
    render() {
-      
 
       return (
          <div class={`preloader`}>

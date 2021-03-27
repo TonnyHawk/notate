@@ -23,14 +23,16 @@ export function getFolders(){
    let promise = new Promise((resolve, reject)=>{
       this.usersRef.doc(user.id).collection('folders').onSnapshot(snap => {
          if(snap.empty){// if collection 'folders' is absent on the firebase
-            this.createFolder('exapmle folder')
-            return
+            this.createFolder('exapmle folder').then((res)=>{
+               resolve("in getFolders: "+res)
+            }).catch((er)=>console.log(er))
+            return promise
          }
          let folders = [];
          snap.forEach(elem=>{
             folders.push({name: elem.data().name, id: elem.id, data: elem.data()})
          })
-         root.setState({folders}, ()=>resolve())
+         root.setState({folders}, ()=>resolve('getted all folders'))
       }, error=>{
          reject('can not get folders')
       })
@@ -40,20 +42,23 @@ export function getFolders(){
 }
 
 export function create(name){
-   let root = this;
-   this.setLoading(true, 'creating a new folder')
-   let {user} = this.state
-
-   this.usersRef.doc(user.id).collection('folders').add({
-      name: name
-   }).then((elem)=>{
-
-      elem.get().then(doc=>{
-         root.choseFolder(doc.id) // created folder is now Current
-         root.setLoading(false)
-      })
-
-   }).catch((er)=>{console.log('error with creating a folder '+er)})
+   return new Promise((res, rej)=>{
+      let root = this;
+      this.setLoading(true, 'creating a new folder')
+      let {user} = this.state
+   
+      this.usersRef.doc(user.id).collection('folders').add({
+         name: name
+      }).then((elem)=>{
+   
+         elem.get().then(doc=>{
+            root.choseFolder(doc.id) // created folder is now Current
+            root.setLoading(false)
+            res('created a new folder')
+         })
+   
+      }).catch((er)=>{console.log('error with creating a folder '+er); rej(er)})
+   })
 }
 
 export function del(id){
@@ -84,18 +89,26 @@ export function del(id){
 }
 
 export function chose(id){
-   let {folders} = this.state;
-   let index = 0;
-   if(id){
-      index = folders.findIndex(elem=>elem.id === id)
-   }
-   this.setState({
-      currentFolder: {name: folders[index].name, id: folders[index].id},
-   }, ()=>{
-      this.setLoading(true, 'loading files')
-      this.getFiles()
-      if(this.state.isSideMenuOpen){
-         this.toggleElement('side-menu')
+   return new Promise((res, rej)=>{
+      let {folders} = this.state;
+      let index = 0;
+      if(id){
+         index = folders.findIndex(elem=>elem.id === id)
       }
+      this.setState({
+         currentFolder: {name: folders[index].name, id: folders[index].id},
+      }, ()=>{
+         this.setLoading(true, 'loading files')
+         this.getFiles()
+            .then(()=>{
+               // console.log('files getted');
+               res('files getted successfuly')})
+            .catch(()=>{
+               console.log('files not getted');
+               rej('some err on getting a files')})
+         if(this.state.isSideMenuOpen){
+            this.toggleElement('side-menu')
+         }
+      })
    })
 }
