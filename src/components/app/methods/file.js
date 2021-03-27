@@ -69,7 +69,7 @@ export function del(){
 export function rename(name){
    let root = this;
    let {selectedFileId, currentFolder, user} = this.state;
-   this.usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').doc(selectedFileId).set({
+   this.usersRef.doc(user.id).collection('folders').doc(currentFolder.id).collection('files').doc(selectedFileId).update({
       name
    }).then(()=>{
       console.log('file renamed');

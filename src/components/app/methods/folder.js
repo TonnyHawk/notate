@@ -1,7 +1,7 @@
 export function rename(name){
    let {currentFolder, user} = this.state;
    let root = this;
-   this.usersRef.doc(user.id).collection('folders').doc(currentFolder.id).set({
+   this.usersRef.doc(user.id).collection('folders').doc(currentFolder.id).update({
       name
    }).then(()=>{
       this.usersRef.doc(user.id).collection('folders').doc(currentFolder.id).get().then(doc=>{
