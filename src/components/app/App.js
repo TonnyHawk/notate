@@ -72,7 +72,7 @@ class App extends Component {
       this._isMounted = true;
       if(window.navigator.onLine){
          this.listenToAuth()
-         // this.signIn('anton.veremko@gmail.com', 'antony2509')
+         this.signIn('anton.veremko@gmail.com', 'antony2509')
          // .then((res)=>{
          //    this.getFolders().then(()=>this.choseFolder());
          // }).catch(err=>console.log(err))
@@ -278,12 +278,12 @@ class App extends Component {
                state={this.state.isLoading} 
                message={this.state.loadingMessage}/>
 
-            <AuthScreen 
+            {/* <AuthScreen 
                toggleElement={this.toggleElement}
                registerUser={this.registerUser}
                signIn={this.signIn}
                user={user}
-               />
+               /> */}
             {/* <Preloader 
                show={showPreloader}
                toggleElement={this.toggleElement}

@@ -4,6 +4,8 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input,
 
 export default class Popup extends Component {
 
+  info = {}
+
    state={
      name: '',
      editing: false,
@@ -58,6 +60,27 @@ export default class Popup extends Component {
     })
    }
 
+   handleSubmit=(e, funct)=>{
+    e.preventDefault();
+
+    let fields = e.target.querySelectorAll('.input__field')
+
+    let acces = true;
+    fields.forEach(elem=>{
+      if(!elem.value){
+        elem.closest('.input').querySelector('.input__error').classList.add('is-active')
+        acces = false
+      } else{
+        elem.closest('.input').querySelector('.input__error').classList.remove('is-active')
+      }
+    })
+
+    if(acces){
+      funct()
+    }
+
+   }
+
    render() {
       let {popup} = this.props
       let toggle = ()=>{
@@ -66,7 +89,7 @@ export default class Popup extends Component {
       }
 
       let {setLoading, renameFolder, renameFile, toggleElement} = this.props
-      let info = {};
+      let {info} = this
       switch(popup.funct){
         case 'create a folder':
           info = {
@@ -114,27 +137,33 @@ export default class Popup extends Component {
       return (
          <div>
            <Modal isOpen={popup.isOpen} toggle={toggle}>
+           <form onSubmit={(e)=>this.handleSubmit(e, info.function)}>
              <ModalHeader>{info.title}</ModalHeader>
              <ModalBody>
-               <form onSubmit={(e)=>{e.preventDefault(); info.function()}}>
                   <Container fluid>
                     <Row>
                       <Col xs='auto' className='mx-auto'><div className="modal__icon"><i class={info.iconClass}></i></div></Col>
                       <div className="w-100 modal__break-line"></div>
                       <Col className='d-flex align-items-center'>
+                        <div className="input w-100">
                         <Input 
-                          type='text' name='name' 
+                          type='text' name='name' className='input__field'
                           onChange={this.handleInput} value={this.state.name} 
                           placeholder={info.placeHolder} autoComplete="off"
-                          onFocus={e=>e.target.select()}></Input></Col>
+                          onFocus={e=>e.target.select()}></Input>
+                          <p className="input__error">this field is not correct fulfield</p>
+                        </div>
+                          
+                      </Col>
+
                     </Row>
                   </Container>
-               </form>
              </ModalBody>
              <ModalFooter>
                <Button color="secondary modal__btn" onClick={toggle}>Cancel</Button>{' '}
-               <Button color="primary modal__btn" onClick={info.function}>Save</Button>
+               <Button color="primary modal__btn" type='submit'>Save</Button>
              </ModalFooter>
+             </form>
            </Modal>
          </div>
        );

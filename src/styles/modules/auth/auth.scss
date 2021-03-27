@@ -3,12 +3,10 @@
    z-index: 550;
    background: gainsboro;
    perspective: 900px;
-   display: none;
    position: fixed;
    overflow: auto;
-   @media(min-width: 600px){
-      @include perfect-center;
-   }
+   @include perfect-center;
+   display: none;
 
    &.is-active{
       display: flex;
@@ -37,7 +35,7 @@
       border: 1px solid black;
       padding-bottom: 51px;
       @media(max-width: 600px){
-         margin-top: 20%;
+         margin-top: -70%;
       }
    }
 

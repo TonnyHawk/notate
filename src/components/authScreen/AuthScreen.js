@@ -34,33 +34,40 @@ class AuthScreen extends Component {
       e.preventDefault();
       let formName = e.target.name
       // this.props.toggleElement('preloader')
-      this.setState({waitingForResponce: true})
 
       let fields = e.target.querySelectorAll('.input__field')
+
+      let acces = true;
       fields.forEach(elem=>{
         if(!elem.value){
           elem.closest('.input').querySelector('.input__error').classList.add('is-active')
+          acces = false
         } else{
           elem.closest('.input').querySelector('.input__error').classList.remove('is-active')
         }
       })
 
-      let {email, pass} = this.state;
-      let {registerUser, signIn} = this.props
-
-      if(formName === 'sign_in'){
-        signIn(email, pass).then(()=>{
-          this.setState({waitingForResponce: false})
-        }).catch((error)=>{
-          this.setState({waitingForResponce: false, error: {state: true, txt: error}})
-        })
-      }
-      else if(formName === 'sign_up'){
-        registerUser(email, pass).then(()=>{
-          this.setState({waitingForResponce: false})
-        }).catch((error)=>{
-          this.setState({waitingForResponce: false, error: {state: true, txt: error}})
-        })
+      if(acces){
+        this.setState({waitingForResponce: true})
+        let {email, pass} = this.state;
+        let {registerUser, signIn} = this.props
+  
+        if(formName === 'sign_in'){
+          signIn(email, pass).then(()=>{
+            this.setState({waitingForResponce: false})
+          }).catch((error)=>{
+            this.setState({waitingForResponce: false, error: {state: true, txt: error}})
+          })
+        }
+        else if(formName === 'sign_up'){
+          registerUser(email, pass).then(()=>{
+            this.setState({waitingForResponce: false})
+          }).catch((error)=>{
+            this.setState({waitingForResponce: false, error: {state: true, txt: error}})
+          })
+        }
+      } else{
+        this.setState({waitingForResponce: false})
       }
    }
 
