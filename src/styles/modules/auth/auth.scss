@@ -1,10 +1,14 @@
 .auth {
    @include layer;
-   @include perfect-center;
    z-index: 550;
    background: gainsboro;
    perspective: 900px;
    display: none;
+   position: fixed;
+   overflow: auto;
+   @media(min-width: 600px){
+      @include perfect-center;
+   }
 
    &.is-active{
       display: flex;
@@ -13,6 +17,7 @@
    &__link{
       cursor: pointer;
       transition: 0.15s;
+      margin-right: 10px;
       &:hover{
          color:#0b5ed7;
       }
@@ -31,6 +36,9 @@
       width: 100%;
       border: 1px solid black;
       padding-bottom: 51px;
+      @media(max-width: 600px){
+         margin-top: 20%;
+      }
    }
 
    // .auth__title

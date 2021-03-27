@@ -63,6 +63,7 @@ button{
    border: 1px solid black;
    border-radius: 6px;
    @include perfect-center;
+   white-space: nowrap;
 }
 
 .has-title{
