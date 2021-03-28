@@ -7,3 +7,10 @@ It uses google firebase to store data and authenticate users.
 The domain and hosting are provided by google.  
 
 See it live [notate.io](https://notate-io.web.app/).
+
+
+### Additional libruaries
+
+anime.js - to animate preloader  
+Jquery  
+
