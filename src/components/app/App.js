@@ -240,8 +240,7 @@ class App extends Component {
 
    render() {
       let {isSideMenuOpen, currentFolder, files, 
-            search, currentFile, status , showPreloader, user, 
-            preloaderState, documentReadyState} = this.state
+            search, currentFile, status , showPreloader, user, documentReadyState} = this.state
 
       return (
          <>
