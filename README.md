@@ -9,7 +9,7 @@ The domain and hosting are also provided by google.
 See it live [notate.io](https://notate-io.web.app/).
 
 *P.S. to skip verification enter:*   
-**email:** admin@admin123  
+**email:** admin@admin.com   
 **password:** admin123  
 
 
