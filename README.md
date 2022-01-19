@@ -13,8 +13,11 @@ See it live [notate.io](https://notate-io.web.app/).
 **password:** admin123  
 
 
-### Additional libruaries
+### Tech Stack
 
+React.js  
+Google firebase / firestore  
 [anime.js](https://animejs.com/) - to animate preloader  
 Jquery  
+
 
